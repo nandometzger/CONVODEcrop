@@ -239,6 +239,8 @@ def get_next_batch(dataloader):
 
 	batch_dict = get_dict_template()
 
+	#TODO: Implement case, where a batch-dict has to be composed!
+
 	# remove the time points where there are no observations in this batch
 	non_missing_tp = torch.sum(data_dict["observed_data"],(0,2)) != 0.
 	batch_dict["observed_data"] = data_dict["observed_data"][:, non_missing_tp]

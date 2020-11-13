@@ -699,8 +699,9 @@ class SwissCrops(object):
 
 
 class Dataset(torch.utils.data.Dataset):
-	def __init__(self, path, t=0.9, mode='all', eval_mode=False, fold=None, gt_path='data/SwissCrops/labelsC.csv',
-		step=1, feature_trunc=10, untile=False, cloud_thresh=0.05):
+	def __init__(self, path,  t=0.9, mode='all', eval_mode=False, fold=None, gt_path='data/SwissCrops/labelsC.csv',
+		step=1, feature_trunc=10, untile=False, prepare_output=False, cloud_thresh=0.05, label_type='all',
+		time_path="data/SwissCrops/raw_dates.hdf5", device=None, subsamp=1, early_prediction=0,args=None ):
 
 		self.data = h5py.File(path, "r")
 		self.samples = self.data["data"].shape[0]
@@ -720,18 +721,26 @@ class Dataset(torch.utils.data.Dataset):
 		self.fold = fold
 		self.gt_path = gt_path
 		self.untile = untile
+		self.label_type = label_type
+		self.prepare_output = prepare_output
 
 		self.shuffle = True
 		self.normalization = True
 		self.normalize = True
 		self.mode = mode
 		self.nb = 3
+		self.device = device
+		
+		if args!=None:
+			self.args = args
+		
+		self.subsamp = subsamp
+		self.early_prediction = early_prediction 
 
 		# define de previously calculated global training mean and std...
 		self.means = [0.4071655 , 0.2441012 , 0.23429523, 0.23402453, 0.00432794, 0.00615292, 0.00566292, 0.00306609, 0.00367624]
 		self.stds = [0.24994541, 0.30625425, 0.32668449, 0.30204761, 0.00490984, 0.00411067, 0.00426914, 0.0027143 , 0.00221963]
 
-		
 		#Get train/test split
 		if self.fold != None:
 			print('5fold: ', fold, '  Mode: ', mode)
@@ -744,7 +753,9 @@ class Dataset(torch.utils.data.Dataset):
 		gt_path_ = './utils/' + gt_path		
 		if not os.path.exists(gt_path_):
 			gt_path_ = './'  + gt_path	
-					
+		
+		self.timestamps =  h5py.File(time_path, "r")["tt"][:]
+
 		file=open(gt_path_, "r")
 		tier_1 = []
 		tier_2 = []
@@ -800,7 +811,6 @@ class Dataset(torch.utils.data.Dataset):
 			tier_3_.append(tier_3_elements.index(tier_3[i]))
 			tier_4_.append(tier_4_elements.index(tier_4[i]))		
 		
-
 		self.label_list_local_1 = []
 		self.label_list_local_2 = []
 		self.label_list_glob = []
@@ -835,9 +845,6 @@ class Dataset(torch.utils.data.Dataset):
 		self.n_classes = max(self.label_list_glob) + 1
 		self.n_classes_local_1 = max(self.label_list_local_1) + 1
 		self.n_classes_local_2 = max(self.label_list_local_2) + 1
-#		self.n_classes = len(self.tier_4_elements_reduced)
-#		self.n_classes_local_1 = len(self.tier_2_elements_reduced)
-#		self.n_classes_local_2 = len(self.tier_3_elements_reduced)
 		
 		print('Dataset size: ', self.samples)
 		print('Valid dataset size: ', self.valid_samples)
@@ -890,16 +897,28 @@ class Dataset(torch.utils.data.Dataset):
 
 		#X = X[self.dates,...] 
 		
+
+		if self.label_type=='13':
+			this_label_list = self.label_list13
+			this_label_list_glob =self.label_list_glob13
+		if self.label_type=='23':
+			this_label_list = self.label_list23
+			this_label_list_glob =self.label_list_glob23
+		else:
+			this_label_list = self.label_list
+			this_label_list_glob =self.label_list_glob			
+			
+			
 		#Change labels 
 		target = np.zeros_like(target_)
 		target_local_1 = np.zeros_like(target_)
 		target_local_2 = np.zeros_like(target_)
-		for i in range(len(self.label_list)):
+		for i in range(len(this_label_list)):
 			#target[target_ == self.label_list[i]] = i
 #			target[target_ == self.label_list[i]] = self.tier_4_elements_reduced.index(self.label_list_glob[i])
 #			target_local_1[target_ == self.label_list[i]] = self.tier_2_elements_reduced.index(self.label_list_local_1[i])
 #			target_local_2[target_ == self.label_list[i]] = self.tier_3_elements_reduced.index(self.label_list_local_2[i])
-			target[target_ == self.label_list[i]] = self.label_list_glob[i]
+			target[target_ == this_label_list[i]] = this_label_list_glob[i]
 			target_local_1[target_ == self.label_list[i]] = self.label_list_local_1[i]
 			target_local_2[target_ == self.label_list[i]] = self.label_list_local_2[i]
 		
@@ -944,11 +963,56 @@ class Dataset(torch.utils.data.Dataset):
 		X = X * 1e-4
 		
 		if not self.untile:
-			
-			if self.eval_mode:  
-				return X.float(), target.long(), target_local_1.long(), target_local_2.long(), cloud_cover.long(), gt_instance.long()	 
+			if self.prepare_output:
+				# prepare to feed it to conv-rnns
+				data = torch.from_numpy( X ).float()#.to(self.dataset.device)
+				time_stamps = torch.from_numpy( self.timestamps )#.to(self.dataset.device)
+				mask = torch.from_numpy(cloud_cover ).float()#.to(self.dataset.device)
+				labels = torch.from_numpy( target ).float()#.to(self.dataset.device)
+
+				data_dict = {
+					"data": data.to(self.device), 
+					"time_steps": time_stamps.to(self.device),
+					"mask": mask.to(self.device),
+					"labels": labels}
+					
+
+				if self.subsamp>0 and self.subsamp<1:
+					max_len = data_dict["mask"].shape[1]
+					features = data_dict["mask"].shape[2]
+					validinds = [torch.nonzero(torch.sum(seq,1)) for seq in data_dict["mask"]] 
+					newinds = [ inds[torch.multinomial(torch.ones(len(inds)), max(int(len(inds)*self.subsamp), 1), replacement=False )] for inds in validinds]
+					data_dict["mask"] = torch.stack([ torch.zeros(max_len, dtype=torch.float32, device=self.dataset.device).scatter_(0, torch.squeeze(inds), 1) for inds in newinds]).unsqueeze(2).repeat(1,1,features)
+
+				if self.early_prediction > 0:
+					zero_input_propagation = True
+					if zero_input_propagation:
+						#Used to test test propagation behaviour of vanilla RNNs
+						data_dict["mask"][:,self.early_prediction:,:] = 1
+						data_dict["data"][:,self.early_prediction:,:] = 0
+					else:
+						# RNNs will not propagate after last observation, but ODE-RNN will
+						filter_rest =  torch.zeros_like(data_dict["mask"]) 
+						filter_rest[:,:self.early_prediction,:] = 1
+						data_dict["mask"] = data_dict["mask"] * filter_rest
+
+				#if self.noskip:
+					# Mark every frame as observed (needed for some experiments)
+					#data_dict["mask"] = torch.ones_like(data_dict["mask"])
+				
+				data_dict["labels"] = data_dict["labels"].to(self.device)
+
+				data_dict = utils.split_and_subsample_batch(data_dict, self.args, data_type = self.mode)
+						
+				print(data_dict)
+
+
 			else:
-				return X.float(), target.long(), target_local_1.long(), target_local_2.long(), cloud_cover.long(),
+				if not self.eval_mode:  
+					return X, target, target_local_1, target_local_2, cloud_cover 
+				else:
+					
+					return X, target, target_local_1, target_local_2, cloud_cover, gt_instance
 
 		else:
 			# convert them to type long()

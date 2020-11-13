@@ -18,7 +18,7 @@ from torch.distributions import uniform
 from torch.utils.data import DataLoader
 
 from crop_classification import Crops, variable_time_collate_fn_crop
-from swisscrop_classification import SwissCrops
+from swisscrop_classification import SwissCrops, Dataset
 
 from sklearn import model_selection
 import random
@@ -224,6 +224,77 @@ def parse_datasets(args, device):
 					"n_labels": train_dataloader.nclasses+1} #plus one, because there is one class that summerizes all the other classes--> "other" is "0"
 		
 		return data_objects
+
+	##################################################################
+	###########	 SWISSMAP Crop Classification	 ####################
+	
+	if dataset_name == "swissmaps":
+		
+		# Search for a dataroot
+		# Search for a dataroot
+		root = r'data/SwissCrops/raw'
+		scratch_root1 = r'/cluster/scratch/metzgern/ODEcrop/Swisscrop/raw'
+		scratch_root2 = r'/scratch/Nando/ODEcrop/Swisscrop/raw'
+		server_root1 = r'/home/pf/pfstud/metzgern_PF/ODE_Nando/ODE_crop_Project/latent_ode-my_mod_hparam/data/SwissCrops/raw'
+		if os.path.exists(scratch_root1):
+			root = scratch_root1
+			print(scratch_root1)
+		elif os.path.exists(scratch_root2):
+			root = scratch_root2
+			print(scratch_root2)
+		elif os.path.exists(server_root1):
+			root = server_root1
+			print(server_root1)
+		else:
+			print(root)
+		data_path = root + "/train_set_24x24_debug.hdf5"
+		print("dataroot: " + root)
+
+		train_dataset_obj = Dataset(data_path, 0.9, 'train', args=args, prepare_output=True, label_type='13', device = device,
+									subsamp=args.trainsub)
+		test_dataset_obj = Dataset(data_path, 0.9, 'test', args=args, prepare_output=True, label_type='13', device = device,
+									subsamp=args.testsub)
+
+		"""
+		train_dataset_obj = SwissCrops(root, mode="train", device=device,  noskip=args.noskip,
+										step=args.step, trunc=args.trunc, nsamples=args.n,
+										datatype=args.swissdatatype, singlepix=args.singlepix)
+		test_dataset_obj = SwissCrops(root, mode="test", device=device,  noskip=args.noskip,
+										step=args.step, trunc=args.trunc, nsamples=args.validn,
+										datatype=args.swissdatatype, singlepix=args.singlepix) 
+		"""
+
+		n_samples = min(args.n, len(train_dataset_obj))
+		n_test_samples = min( float("inf"), len(test_dataset_obj))
+		
+		#evaluation batch sizes. #Must be tuned to increase efficency of evaluation
+		validation_batch_size = 10 # size 30000 is 10s per batch, also depending on server connection
+		train_batch_size = min(args.batch_size, args.n)
+		test_batch_size = min(n_test_samples, validation_batch_size)
+
+		a_train_dict = train_dataset_obj[0]
+		vals = a_train_dict["observed_data"]
+		tt = a_train_dict["observed_tp"]
+		mask = a_train_dict["observed_mask"]
+		labels = a_train_dict["labels"]
+		
+		traindataloader = torch.utils.data.DataLoader(train_dataset_obj,batch_size=train_batch_size, shuffle=True, num_workers=12)
+		traindataloader = torch.utils.data.DataLoader(test_dataset_obj,batch_size=test_batch_size, shuffle=True, num_workers=12)
+
+		train_dataloader = FastTensorDataLoader(train_dataset_obj, batch_size=train_batch_size, subsamp=args.trainsub)
+		test_dataloader = FastTensorDataLoader(test_dataset_obj, batch_size=test_batch_size, subsamp=args.testsub)
+
+		data_objects = {"dataset_obj": train_dataset_obj, 
+					"train_dataloader": utils.inf_generator(train_dataloader), 
+					"test_dataloader": utils.inf_generator(test_dataloader), 
+					"input_dim": vals.size(-1),
+					"n_train_batches": len(train_dataloader),
+					"n_test_batches": len(test_dataloader),
+					"classif_per_tp": False, # We want to classify the whole sequence!!. Standard: True, #optional
+					"n_labels": train_dataloader.nclasses+1} #plus one, because there is one class that summerizes all the other classes--> "other" is "0"
+		
+		return data_objects
+
 
 	########### 1d datasets ###########
 
