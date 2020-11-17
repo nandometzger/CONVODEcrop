@@ -22,15 +22,16 @@ from torchdiffeq import odeint as odeint
 
 class DiffeqSolver(nn.Module):
 	def __init__(self, input_dim, ode_func, method, latents, 
-			odeint_rtol = 1e-4, odeint_atol = 1e-5, device = torch.device("cpu")):
+			odeint_rtol = 1e-4, odeint_atol = 1e-5, device = torch.device("cpu"),
+			convolutional=False):
 		super(DiffeqSolver, self).__init__()
 
 		#Comment from Nando: input_dim is unused!
-		
 		self.ode_method = method
 		self.latents = latents		
 		self.device = device
 		self.ode_func = ode_func
+		self.convolutional = convolutional
 
 		self.odeint_rtol = odeint_rtol
 		self.odeint_atol = odeint_atol
@@ -44,7 +45,11 @@ class DiffeqSolver(nn.Module):
 
 		pred_y = odeint(self.ode_func, first_point, time_steps_to_predict, 
 			rtol=self.odeint_rtol, atol=self.odeint_atol, method = self.ode_method)
-		pred_y = pred_y.permute(1,2,0,3)
+		
+		if self.convolutional:
+			pred_y = pred_y.permute(1,2,0,3,4)
+		else:
+			pred_y = pred_y.permute(1,2,0,3)
 
 		assert(torch.mean(pred_y[:, :, 0, :]  - first_point) < 0.001)
 		assert(pred_y.size()[0] == n_traj_samples)

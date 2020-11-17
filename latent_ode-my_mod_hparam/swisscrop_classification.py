@@ -701,7 +701,8 @@ class SwissCrops(object):
 class Dataset(torch.utils.data.Dataset):
 	def __init__(self, path,  t=0.9, mode='all', eval_mode=False, fold=None, gt_path='data/SwissCrops/labelsC.csv',
 		step=1, feature_trunc=10, untile=False, prepare_output=False, cloud_thresh=0.05, label_type='all',
-		time_path="data/SwissCrops/raw_dates.hdf5", device=None, subsamp=1, early_prediction=0,args=None ):
+		time_path="data/SwissCrops/raw_dates.hdf5", device=None, subsamp=1, early_prediction=0,
+		args=None, part_update=False ):
 
 		self.data = h5py.File(path, "r")
 		self.samples = self.data["data"].shape[0]
@@ -714,7 +715,7 @@ class Dataset(torch.utils.data.Dataset):
 		self.eval_mode = eval_mode
 		self.fold = fold
 		self.step = step
-		self.featrue_trunc = feature_trunc
+		self.feature_trunc = min([feature_trunc, 9])
 		self.cloud_thresh = cloud_thresh
 
 		self.eval_mode = eval_mode
@@ -723,7 +724,7 @@ class Dataset(torch.utils.data.Dataset):
 		self.untile = untile
 		self.label_type = label_type
 		self.prepare_output = prepare_output
-
+		self.part_update = part_update
 		self.shuffle = True
 		self.normalization = True
 		self.normalize = True
@@ -754,7 +755,7 @@ class Dataset(torch.utils.data.Dataset):
 		if not os.path.exists(gt_path_):
 			gt_path_ = './'  + gt_path	
 		
-		self.timestamps =  h5py.File(time_path, "r")["tt"][:]
+		self.timestamps =  h5py.File(time_path, "r")["tt"][::self.step]
 
 		file=open(gt_path_, "r")
 		tier_1 = []
@@ -854,7 +855,6 @@ class Dataset(torch.utils.data.Dataset):
 		print('Number of classes - local-1: ', self.n_classes_local_1)
 		print('Number of classes - local-2: ', self.n_classes_local_2)
 
-
 		#for consistency loss---------------------------------------------------------
 		self.l1_2_g = np.zeros(self.n_classes)
 		self.l2_2_g = np.zeros(self.n_classes)
@@ -871,10 +871,48 @@ class Dataset(torch.utils.data.Dataset):
 		#for consistency loss---------------------------------------------------------
 		
 		print('Number of filed instance: ', np.unique(self.data["gt_instance"][...,0]).shape[0])
+
+		# complete Labels
+		self.labellist = np.array([ 1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,
+									14,  15,  16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,
+									27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,
+									43,  44,  45,  50,  51,  52,  53,  54,  58,  59,  60,  61,  62,
+									63,  64,  65,  66,  67,  68,  69,  71,  74,  75,  76,  77,  78,
+									81,  84,  85,  88,  91,  93,  95, 108, 109, 110, 113, 114, 120,
+									121, 123])
+		self.labellistglob = np.array([   39, 49, 26, 48, 13, 48, 20,  8, 41, 51, 32, 13, 36, 20, 20, 38,  2,
+											30, 30, 40, 50, 34, 42, 18, 15, 10, 29, 19, 31, 43, 33, 13, 18, 45,
+											45,  7,  5, 33,  3,  4,  9,  9, 22,  4, 24, 50, 42, 21, 21, 21, 21,
+											21, 27, 27, 27, 21, 21, 27, 17, 21, 46,  1, 28, 37,  3, 16, 44, 44,
+											46,  6, 46, 46, 14, 14, 14, 11, 23,  4, 12, 27])
+
+		# 13 Labels
+		self.labellist13 = np.array([   2,   4,   6,   7,  10,  13,  14,  15,  16,  18,  19,  21,  23,
+										34,  35,  53,  54,  58,  59,  60,  61,  62,  63,  64,  65,  66,
+										67,  68,  71,  74,  88,  93,  95, 123])
+		self.labellistglob13 = np.array([ 49, 48, 48, 20, 51, 36, 20, 20, 38, 30, 30, 50, 42, 45, 45, 50, 42,
+       									    21, 21, 21, 21, 21, 27, 27, 27, 21, 21, 27, 21, 46, 46, 46, 46, 27])
+
+		# 23 Labels
+		self.labellist23 = np.array([  2,   3,   4,   6,   7,   8,   9,  10,  11,  13,  14,  15,  16,
+										18,  19,  21,  22,  23,  26,  27,  34,  35,  44,  45,  53,  54,
+										58,  59,  60,  61,  62,  63,  64,  65,  66,  67,  68,  71,  74,
+										84,  85,  88,  93,  95, 108, 109, 110, 123])
+		self.labellistglob23 = np.array([49, 26, 48, 48, 20,  8, 41, 51, 32, 36, 20, 20, 38, 30, 30, 50, 34,
+											42, 10, 29, 45, 45,  9,  9, 50, 42, 21, 21, 21, 21, 21, 27, 27, 27,
+											21, 21, 27, 21, 46, 44, 44, 46, 46, 46, 14, 14, 14, 27])
 	   
 		
 	def __len__(self):
 		return self.valid_samples
+
+	def nclasses(self):
+		if self.label_type=='13':
+			return 14
+		if self.label_type=='23':
+			return 24
+		else:
+			return 52 
 
 	def __getitem__(self, idx):
 					 
@@ -884,40 +922,41 @@ class Dataset(torch.utils.data.Dataset):
 		cloud_cover = self.data["cloud_cover"][idx,...]
 		gt_instance = self.data["gt_instance"][idx,...,0]
 
-
 		X = np.transpose(X, (0, 3, 1, 2))
 		
-		#X = X[0::2,:4,...]
-		#Use half of the time series
-		step = self.step
-		feature_trunc = self.featrue_trunc
-		if not (step==1 and feature_trunc>=9):
-			X = X[0::step,:feature_trunc,...]
-			cloud_cover = cloud_cover[0::step,...]
+		nt, nf, h, w = X.shape
 
-		#X = X[self.dates,...] 
-		
+		#Use half of the time series
+		feature_trunc = self.feature_trunc
+		if not (self.step==1 and feature_trunc>=9):
+			X = X[0::self.step,:feature_trunc,...]
+			cloud_cover = cloud_cover[0::self.step,...]
 
 		if self.label_type=='13':
 			this_label_list = self.label_list13
-			this_label_list_glob =self.label_list_glob13
-		if self.label_type=='23':
+			this_label_list_glob = self.label_list_glob13
+			reflistglob = self.labellistglob13
+		elif self.label_type=='23':
 			this_label_list = self.label_list23
 			this_label_list_glob =self.label_list_glob23
+			reflistglob = self.labellistglob23
 		else:
 			this_label_list = self.label_list
 			this_label_list_glob =self.label_list_glob			
-			
+			reflistglob = self.labellistglob
 			
 		#Change labels 
 		target = np.zeros_like(target_)
+		dummy = np.zeros_like(target_)
 		target_local_1 = np.zeros_like(target_)
 		target_local_2 = np.zeros_like(target_)
+		dummy_ = np.arange(24*24).reshape(24,24)
 		for i in range(len(this_label_list)):
 			#target[target_ == self.label_list[i]] = i
 #			target[target_ == self.label_list[i]] = self.tier_4_elements_reduced.index(self.label_list_glob[i])
 #			target_local_1[target_ == self.label_list[i]] = self.tier_2_elements_reduced.index(self.label_list_local_1[i])
 #			target_local_2[target_ == self.label_list[i]] = self.tier_3_elements_reduced.index(self.label_list_local_2[i])
+			dummy[dummy_ == this_label_list[i]] = this_label_list_glob[i]
 			target[target_ == this_label_list[i]] = this_label_list_glob[i]
 			target_local_1[target_ == self.label_list[i]] = self.label_list_local_1[i]
 			target_local_2[target_ == self.label_list[i]] = self.label_list_local_2[i]
@@ -956,7 +995,7 @@ class Dataset(torch.utils.data.Dataset):
 				target_local_1 = target_local_1.flip(0,1)  
 				target_local_2 = target_local_2.flip(0,1)  
 				if self.eval_mode:					
-					gt_instance = gt_instancetarget_ == self.label_list[i].fdata_statlip(0,1)
+					gt_instance = gt_instance.flip(0,1)
 
 		
 		#keep values between 0-1
@@ -965,10 +1004,34 @@ class Dataset(torch.utils.data.Dataset):
 		if not self.untile:
 			if self.prepare_output:
 				# prepare to feed it to conv-rnns
-				data = torch.from_numpy( X ).float()#.to(self.dataset.device)
+				
+				data_full = torch.from_numpy( X ).float()#.to(self.dataset.device)
 				time_stamps = torch.from_numpy( self.timestamps )#.to(self.dataset.device)
-				mask = torch.from_numpy(cloud_cover ).float()#.to(self.dataset.device)
+				cloud_cover = torch.from_numpy(cloud_cover ).float()#.to(self.dataset.device)
 				labels = torch.from_numpy( target ).float()#.to(self.dataset.device)
+				
+				# truncate bad weather
+				raw_mask = (cloud_cover>self.cloud_thresh).type(torch.float32)
+				raw_mask = raw_mask.unsqueeze(1).repeat(1,self.feature_trunc,1,1)
+				
+				#TODO: input 0 according to bad weather mask
+				if self.part_update:
+					nanfilter = torch.ones_like(raw_mask)
+					nanfilter[raw_mask.bool()==0] = torch.from_numpy(np.array([np.NaN])).type(torch.float32)
+					data = data_full * nanfilter
+				else: 
+					#discard the whole map if there is a cloud, adjust the mask accordingly
+					mask_shape =  (1,) + tuple(raw_mask.shape[1:])
+					mask = (torch.sum(~raw_mask.bool(),(1,2,3))==0).unsqueeze(1).unsqueeze(2).unsqueeze(3).repeat(mask_shape)
+
+					data = data_full * mask
+				
+				"""
+				data = X#.to(self.dataset.device)
+				time_stamps = self.timestamps#.to(self.dataset.device)
+				mask = cloud_cover#.to(self.dataset.device)
+				labels = target#.to(self.dataset.device)
+				"""
 
 				data_dict = {
 					"data": data.to(self.device), 
@@ -982,7 +1045,7 @@ class Dataset(torch.utils.data.Dataset):
 					features = data_dict["mask"].shape[2]
 					validinds = [torch.nonzero(torch.sum(seq,1)) for seq in data_dict["mask"]] 
 					newinds = [ inds[torch.multinomial(torch.ones(len(inds)), max(int(len(inds)*self.subsamp), 1), replacement=False )] for inds in validinds]
-					data_dict["mask"] = torch.stack([ torch.zeros(max_len, dtype=torch.float32, device=self.dataset.device).scatter_(0, torch.squeeze(inds), 1) for inds in newinds]).unsqueeze(2).repeat(1,1,features)
+					data_dict["mask"] = torch.stack([ torch.zeros(max_len, dtype=torch.float32, device=self.device).scatter_(0, torch.squeeze(inds), 1) for inds in newinds]).unsqueeze(2).repeat(1,1,features)
 
 				if self.early_prediction > 0:
 					zero_input_propagation = True
@@ -999,12 +1062,43 @@ class Dataset(torch.utils.data.Dataset):
 				#if self.noskip:
 					# Mark every frame as observed (needed for some experiments)
 					#data_dict["mask"] = torch.ones_like(data_dict["mask"])
+				#perform remapping for Swisscrops
+				targetind = data_dict["labels"]
+
+				for i in range(len(self.labellistglob)):
+					#delete the label if it is not within the k most frequent classes k={13,23}
+					if not (self.labellist[i] in self.labellist13):
+						targetind[targetind == self.labellistglob[i]] = 0
 				
-				data_dict["labels"] = data_dict["labels"].to(self.device)
+				# Reduce range of labels
+				uniquelabels = np.unique(reflistglob)
+				for i in range(self.nclasses()-1):
+					targetind[targetind == uniquelabels[i]] = i+1
+
+				#Convert back to one hot
+				labels = torch.nn.functional.one_hot(targetind.long(),self.nclasses()).permute(2,0,1)
+				#labels = torch.zeros((h, w, self.nclasses()))
+				#labels[np.arange(h), np.arange(w), targetind] = 1
+				data_dict["labels"] = labels.to(self.device)
+
+				#data_dict["labels"] = data_dict["labels"].to(self.device)
 
 				data_dict = utils.split_and_subsample_batch(data_dict, self.args, data_type = self.mode)
-						
-				print(data_dict)
+				
+				observed_data = data_dict["observed_data"]
+				observed_tp =  data_dict["observed_tp"]
+				data_to_predict = data_dict["data_to_predict"]
+				tp_to_predict = data_dict["tp_to_predict"]
+				observed_mask = data_dict["observed_mask"]
+				mask_predicted_data = data_dict["mask_predicted_data"]
+				labels = data_dict["labels"]
+				mode = data_dict["mode"]
+				
+				if not self.eval_mode:  
+					return  observed_data.float(), observed_tp.float(), data_to_predict.float(), tp_to_predict.float(), observed_mask.float(), mask_predicted_data.float(), labels.float(), mode
+
+				else:
+					return observed_data, observed_tp, data_to_predict, tp_to_predict, observed_mask, mask_predicted_data, labels, mode, gt_instance
 
 
 			else:
@@ -1100,7 +1194,6 @@ class Dataset(torch.utils.data.Dataset):
 
 			# "destroy" data, that is corrputed by bad weather. We will never use it!
 			ravel_X[~mask] = 0
-
 
 			return ravel_X, OH_target, OH_target_local_1, OH_target_local_2, mask, sub_gt_instance
 

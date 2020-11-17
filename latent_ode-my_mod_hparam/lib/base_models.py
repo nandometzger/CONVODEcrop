@@ -25,8 +25,20 @@ import sklearn as sk
 
 import pdb
 
-def create_classifier(z0_dim, n_labels):
-	return nn.Sequential(
+def create_classifier(z0_dim, n_labels, convolutional=False):
+	if convolutional:
+		kernel_size = 3
+		padding = int(kernel_size/2)
+		return nn.Sequential(
+			nn.Conv2d(z0_dim, 300, kernel_size=kernel_size, stride=1, padding=padding, padding_mode='reflect'),
+			nn.ReLU(),
+			nn.Conv2d(300, 300, kernel_size=kernel_size, stride=1, padding=padding, padding_mode='reflect'),
+			nn.ReLU(),
+			nn.Conv2d(300, n_labels, kernel_size=kernel_size, stride=1, padding=padding, padding_mode='reflect'),
+			nn.Softmax(dim=(1)), #for Convodernn we use dim=(1)
+			)
+	else:
+		return nn.Sequential(
 			nn.Linear(z0_dim, 300),
 			nn.ReLU(),
 			nn.Linear(300, 300),
@@ -45,22 +57,20 @@ def create_RNN_classifier(z0_dim, n_labels):
 			nn.Softmax(dim=(1)), #for ODERNN we use dim=(2)
 			)
 	
-
 class Baseline(nn.Module):
 	def __init__(self, input_dim, latent_dim, device, 
-		obsrv_std = 0.01, use_binary_classif = False,
-		classif_per_tp = False,
-		use_poisson_proc = False,
-		linear_classifier = False,
-		n_labels = 1,
-		train_classif_w_reconstr = False,
-		RNN_type=False):
+		obsrv_std=0.01, use_binary_classif=False,
+		classif_per_tp=False,
+		use_poisson_proc=False,
+		linear_classifier=False,
+		n_labels=1,
+		train_classif_w_reconstr=False,
+		RNN_type=False, convolutional=False):
 		super(Baseline, self).__init__()
 
 		self.input_dim = input_dim
 		self.latent_dim = latent_dim
 		self.n_labels = n_labels
-
 		self.obsrv_std = torch.Tensor([obsrv_std]).to(device)
 		self.device = device
 
@@ -69,6 +79,7 @@ class Baseline(nn.Module):
 		self.use_poisson_proc = use_poisson_proc
 		self.linear_classifier = linear_classifier
 		self.train_classif_w_reconstr = train_classif_w_reconstr
+		self.convolutional = convolutional
 
 		z0_dim = latent_dim
 		if use_poisson_proc:
@@ -123,8 +134,8 @@ class Baseline(nn.Module):
 		n_tp_to_sample = None, n_traj_samples = 1, kl_coef = 1.,
 		testing=False):
 
-		#pdb.set_trace()
 		loss = 0
+		results = {}
 		# Condition on subsampled points
 		# Make predictions for all the points
 		pred_x, info, latent_info = self.get_reconstruction(batch_dict["tp_to_predict"], 
@@ -157,10 +168,11 @@ class Baseline(nn.Module):
 					info["label_predictions"], 
 					batch_dict["labels"])
 			else:
+				#TODO: Make ready for convolutioins!!!
 				ce_loss = compute_multiclass_CE_loss(
 					info["label_predictions"], 
 					batch_dict["labels"],
-					mask = batch_dict["mask_predicted_data"])
+					mask = batch_dict["mask_predicted_data"], convolutional=self.convolutional)
 
 			if torch.isnan(ce_loss):
 				print("label pred")
@@ -181,6 +193,12 @@ class Baseline(nn.Module):
 
 		if self.use_poisson_proc:
 			loss = loss - 0.1 * pois_log_likelihood 
+
+		if self.convolutional:
+			results["label_predictions_map"] = info["label_predictions"]
+			results["labels_map"] = batch_dict["labels"]
+			info["label_predictions"] = info["label_predictions"].permute(0,2,3,1).reshape( (-1,)+(info["label_predictions"].shape[1],)).unsqueeze(0)
+			batch_dict["labels"] = batch_dict["labels"].permute(0,2,3,1).reshape( (-1,)+(batch_dict["labels"].shape[1],))
 
 		if self.use_binary_classif:
 			accuracy = sk.metrics.accuracy_score(

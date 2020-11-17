@@ -17,6 +17,7 @@ import lib.utils as utils
 from lib.utils import get_device
 
 from lib.RNNcells import STAR_unit, GRU_unit, GRU_standard_unit, LSTM_unit
+from lib.CONVRNNcells import CONVSTAR_unit, CONVGRU_unit, CONVGRU_standard_unit, CONVLSTM_unit
 
 import pdb
 import numpy as np
@@ -102,7 +103,7 @@ class Encoder_z0_ODE_RNN(nn.Module):
 		z0_dim = None, RNN_update = None, 
 		n_gru_units = 100, device = torch.device("cpu"),
 		RNNcell = None, use_BN=True,
-		use_ODE = True, nornnimputation=False):
+		use_ODE = True, nornnimputation=False, convolutional=False):
 		
 		super(Encoder_z0_ODE_RNN, self).__init__()
 
@@ -113,29 +114,49 @@ class Encoder_z0_ODE_RNN(nn.Module):
 
 		rnn_input = input_dim		
 		self.latent_dim = latent_dim
+		self.convolutional = convolutional
 
 		if RNN_update is None:
 			self.RNNcell = RNNcell
+			
+			if self.convolutional:
+				if self.RNNcell=='gru':
+					self.RNN_update = GRU_unit(latent_dim, rnn_input, n_units = n_gru_units, device=device).to(device)
 
-			if self.RNNcell=='gru':
-				self.RNN_update = GRU_unit(latent_dim, rnn_input, n_units = n_gru_units, device=device).to(device)
+				elif self.RNNcell=='gru_small':
+					self.RNN_update = GRU_standard_unit(latent_dim, rnn_input, device=device).to(device)
 
-			elif self.RNNcell=='gru_small':
-				self.RNN_update = GRU_standard_unit(latent_dim, rnn_input, device=device).to(device)
+				elif self.RNNcell=='lstm':
+					self.latent_dim = latent_dim*2
+					self.RNN_update = LSTM_unit(self.latent_dim, rnn_input).to(device)
 
-			elif self.RNNcell=='lstm':
-				self.latent_dim = latent_dim*2
-				self.RNN_update = LSTM_unit(self.latent_dim, rnn_input).to(device)
-			elif self.RNNcell=="star":
-				self.RNN_update = STAR_unit(latent_dim, rnn_input, n_units = n_gru_units).to(device)
+				elif self.RNNcell=="star":
+					self.RNN_update = STAR_unit(latent_dim, rnn_input, n_units = n_gru_units).to(device)
 
+				else:
+					raise Exception("Invalid RNN-cell type. Hint: expdecay not available for ODE-RNN")
 			else:
-				raise Exception("Invalid RNN-cell type. Hint: expdecay not available for ODE-RNN")
+
+				if self.RNNcell=='gru':
+					self.RNN_update = GRU_unit(latent_dim, rnn_input, n_units = n_gru_units, device=device).to(device)
+
+				elif self.RNNcell=='gru_small':
+					self.RNN_update = GRU_standard_unit(latent_dim, rnn_input, device=device).to(device)
+
+				elif self.RNNcell=='lstm':
+					self.latent_dim = latent_dim*2
+					self.RNN_update = LSTM_unit(self.latent_dim, rnn_input).to(device)
+
+				elif self.RNNcell=="star":
+					self.RNN_update = STAR_unit(latent_dim, rnn_input, n_units = n_gru_units).to(device)
+
+				else:
+					raise Exception("Invalid RNN-cell type. Hint: expdecay not available for ODE-RNN")
 
 		else:
-			RNN_choices = {"gru": GRU_unit, "gru_small": GRU_standard_unit, "lstm": LSTM_unit, "star": STAR_unit}
+			RNN_choices = {"gru": [GRU_unit, CONVGRU_unit], "gru_small": [GRU_standard_unit, CONVGRU_standard_unit], "lstm": [LSTM_unit, CONVLSTM_unit], "star": [STAR_unit, CONVSTAR_unit]}
 			for name,rnn_unit in RNN_choices.items():
-				if isinstance(RNN_update, rnn_unit):
+				if isinstance(RNN_update, rnn_unit[0]) or isinstance(RNN_update, rnn_unit[1]):
 					self.RNNcell = name
 
 			if self.RNNcell=="lstm":
@@ -157,7 +178,11 @@ class Encoder_z0_ODE_RNN(nn.Module):
 		self.device = device
 		self.extra_info = None
 		
-		self.output_bn = nn.BatchNorm1d(latent_dim)
+		if self.convolutional:
+			self.output_bn = nn.BatchNorm2d(latent_dim)
+		else:
+			self.output_bn = nn.BatchNorm1d(latent_dim)
+
 
 
 	def forward(self, data, time_steps, run_backwards = True, save_info = False):
@@ -196,28 +221,47 @@ class Encoder_z0_ODE_RNN(nn.Module):
 		run_backwards = True, save_info = False, testing=False):
 		# IMPORTANT: assumes that 'data' already has mask concatenated to it 
 
-		n_traj, n_tp, n_dims = data.size()
+		data_and_mask_size = data.size()
+		n_traj = data_and_mask_size[0]
+		n_tp = data_and_mask_size[1]
+		n_dims = data_and_mask_size[2]
+		if self.convolutional:
+			h, w = data_and_mask_size[3:]
+
 		extra_info = []
 		save_latents = 10 if testing else 0
-
 		device = get_device(data)
+		
+		#shape of latent dimension
+		if self.convolutional:
+			if self.RNNcell=='lstm':
+				hidden_shape = (n_traj, self.latent_dim//2, h, w)
+			else:
+				hidden_shape = (n_traj, self.latent_dim, h, w)
+		else:
+			if self.RNNcell=='lstm':
+				hidden_shape = (1, n_traj, self.latent_dim//2)
+			else:
+				hidden_shape = (1, n_traj, self.latent_dim)
 
 		# Initialize the hidden state with noise
 		if self.RNNcell=='lstm':
-			# make some noise
-			prev_h = torch.zeros((1, n_traj, self.latent_dim//2)).data.normal_(0, 0.0001).to(device)
-			prev_h_std = torch.zeros((1, n_traj, self.latent_dim//2)).data.normal_(0, 0.0001).to(device)
+			hidden_shape[2] = hidden_shape[2]//2 
 
-			ci = torch.zeros((1, n_traj, self.latent_dim//2)).data.normal_(0, 0.0001).to(device)
-			ci_std = torch.zeros((1, n_traj, self.latent_dim//2)).data.normal_(0, 0.0001).to(device)
+			# make some noise
+			prev_h = torch.zeros(hidden_shape).data.normal_(0, 0.0001).to(device)
+			prev_h_std = torch.zeros(hidden_shape).data.normal_(0, 0.0001).to(device)
+
+			ci = torch.zeros(hidden_shape).data.normal_(0, 0.0001).to(device)
+			ci_std = torch.zeros(hidden_shape).data.normal_(0, 0.0001).to(device)
 			
 			#concatinate cell state and hidden state
-			prev_y = torch.cat([prev_h, ci], -1)
-			prev_std = torch.cat([prev_h_std, ci_std], -1)
+			prev_y = torch.cat([prev_h, ci], 2)
+			prev_std = torch.cat([prev_h_std, ci_std], 2)
 		else:
 			# make some noise
-			prev_y = torch.zeros((1, n_traj, self.latent_dim)).data.normal_(0, 0.0001).to(device)
-			prev_std = torch.zeros((1, n_traj, self.latent_dim)).data.normal_(0, 0.0001).to(device)
+			prev_y = torch.zeros(hidden_shape).data.normal_(0, 0.0001).to(device)
+			prev_std = torch.zeros(hidden_shape).data.normal_(0, 0.0001).to(device)
 
 		#prev_t, t_i = time_steps[-1] + 0.01,  time_steps[-1] # original
 		#prev_t = time_steps[0] - 0.00001 # new2
@@ -291,17 +335,32 @@ class Encoder_z0_ODE_RNN(nn.Module):
 				
 				# extract the mask for the current (single) time step
 				single_mask = data[:,i,self.input_dim//2]
-				delta_ts = (prev_t - t_i).repeat(1,n_traj,1).float()
-				delta_ts[:,~single_mask.bool(),:] = 0
-				
-				if self.nornnimputation:
-					delta_ts[:,:,:] = 0
 
-				features = data[:,i,:self.input_dim//2].unsqueeze(0)
-				new_mask = single_mask.unsqueeze(0).unsqueeze(2).repeat(1,1,self.input_dim//2+1)
+				if self.convolutional:
+					#shape delta ts
+					delta_ts = (prev_t - t_i).repeat(1,n_traj,1,h,w).float()
+					delta_ts[:,~single_mask.unsqueeze(1).bool()] = 0
+
+					if self.nornnimputation:
+						delta_ts[:,:,:,:,:] = 0
+
+					features = data[:,i,:self.input_dim//2].unsqueeze(0)
+					new_mask = single_mask.unsqueeze(0).unsqueeze(2).repeat(1,1,self.input_dim//2+1,1,1)
+
+
+				else:
+						
+					delta_ts = (prev_t - t_i).repeat(1,n_traj,1).float()
+					delta_ts[:,~single_mask.bool(),:] = 0
+					
+					if self.nornnimputation:
+						delta_ts[:,:,:] = 0
+
+					features = data[:,i,:self.input_dim//2].unsqueeze(0)
+					new_mask = single_mask.unsqueeze(0).unsqueeze(2).repeat(1,1,self.input_dim//2+1)
 
 				#creating new data including delta ts plus mask, concaninate the delta t for pure RNN
-				xi = torch.cat([ features , delta_ts, new_mask], -1)
+				xi = torch.cat([ features , delta_ts, new_mask], 2)
 
 
 			if self.RNNcell=='lstm':
@@ -382,11 +441,16 @@ class Encoder_z0_ODE_RNN(nn.Module):
 			# Experimental: for selective BN of outputs
 			fancy_BN = False
 			if fancy_BN:
-				# not faster due to non-contigious data
+				# sparse, batch_norm function: not faster due to non-contigious data
 				obs_mask = data[:,:,self.input_dim//2].permute(1,0)
 				latent_ys[:,obs_mask.bool()] = self.output_bn(latent_ys[:,obs_mask.bool()].permute(0,2,1)).permute(0,2,1)
 			else:
-				latent_ys = self.output_bn(latent_ys.squeeze().permute(0,2,1)).permute(0,2,1).unsqueeze(0) #orig
+				if self.convolutional:
+					origshape = latent_ys.shape
+					bnshape = (-1,) + tuple(origshape[2:])
+					latent_ys_out = self.output_bn(latent_ys.reshape(bnshape)).reshape(origshape) #orig
+				else:
+					latent_ys = self.output_bn(latent_ys.squeeze().permute(0,2,1)).permute(0,2,1).unsqueeze(0) #orig
 
 		assert(not torch.isnan(yi).any())
 		assert(not torch.isnan(yi_std).any())

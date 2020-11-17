@@ -88,43 +88,52 @@ def compute_binary_CE_loss(label_predictions, mortality_label):
 	return ce_loss
 
 
-def compute_multiclass_CE_loss(label_predictions, true_label, mask):
+def compute_multiclass_CE_loss(label_predictions, true_label, mask, convolutional=False):
 	#print("Computing multi-class classification loss: compute_multiclass_CE_loss")
 	def CXE(predicted, target):
 		return -(target * torch.log(predicted)).sum(dim=1).mean()
 	
 	n_tp = 1
 	n_traj_samples = 1
+	h,w = 1,1
 	
 	crop_set = False
 	RNN = False
 	
 	if (len(label_predictions.size()) == 3):
 		label_predictions = label_predictions.unsqueeze(0)
+		repshape = (n_traj_samples, 1, 1)
 	
 	if (len(true_label.size()) == 2) and (len(label_predictions.size()) == 2):
 		n_traj, n_dims = true_label.size()
+		repshape = (n_traj_samples, 1, 1)
 		RNN = True
 		crop_set = True
 		
 	elif (len(true_label.size()) == 2):
 		n_traj_samples, _, n_traj, n_dims = label_predictions.size()
+		repshape = (n_traj_samples, 1, 1)
+		crop_set = True
+	elif convolutional:
+		n_traj, n_dims, h, w = label_predictions.size()
+		repshape = (1,1,1,1)
 		crop_set = True
 	else:
 		n_traj_samples, n_traj, n_tp, n_dims = label_predictions.size()
+		repshape = (n_traj_samples, 1, 1)
 		crop_set = False
 
 	# assert(not torch.isnan(label_predictions).any())
 	# assert(not torch.isnan(true_label).any())
 
 	# For each trajectory, we get n_traj_samples samples from z0 -- compute loss on all of them
-	true_label = true_label.repeat(n_traj_samples, 1, 1)
+	true_label = true_label.repeat(repshape)
 
-	label_predictions = label_predictions.reshape(n_traj_samples * n_traj * n_tp, n_dims)
-	true_label = true_label.reshape(n_traj_samples * n_traj * n_tp, n_dims)
+	label_predictions = label_predictions.reshape(n_traj_samples * n_traj * n_tp * h * w, n_dims)
+	true_label = true_label.reshape(n_traj_samples * n_traj * n_tp * h * w, n_dims)
 
 	# choose time points with at least one measurement
-	mask = torch.sum(mask, -1) > 0
+	mask = torch.sum(mask, 2) > 0
 
 	# repeat the mask for each label to mark that the label for this time point is present
 	if crop_set or RNN:
@@ -146,11 +155,9 @@ def compute_multiclass_CE_loss(label_predictions, true_label, mask):
 	if (label_predictions.size(-1) > 1) and (true_label.size(-1) > 1):
 		assert(label_predictions.size(-1) == true_label.size(-1))
 		# targets are in one-hot encoding -- convert to indices
-		_, true_label_hard = true_label.max(-1)
+		_, true_label_hard = true_label.max(1)
 		
-		#Nando's comment: but what if i want soft labels for my cross entropy? use the labels_soft variable => solved!
-		
-	
+
 	vectorized = True
 	if not vectorized:
 
@@ -159,7 +166,6 @@ def compute_multiclass_CE_loss(label_predictions, true_label, mask):
 			pred_masked = torch.masked_select(label_predictions[i], pred_mask[i].bool()) #byte()
 			labels_hard = torch.masked_select(true_label_hard[i], label_mask[i].bool()) #byte()
 			labels_soft = torch.masked_select(true_label[i], label_mask[i].bool()) #byte()
-			
 			
 			pred_masked = pred_masked.reshape(-1, n_dims)
 

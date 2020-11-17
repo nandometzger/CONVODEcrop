@@ -250,20 +250,14 @@ def parse_datasets(args, device):
 		data_path = root + "/train_set_24x24_debug.hdf5"
 		print("dataroot: " + root)
 
+		torch.multiprocessing.set_start_method('spawn', force=True)
+
 		train_dataset_obj = Dataset(data_path, 0.9, 'train', args=args, prepare_output=True, label_type='13', device = device,
-									subsamp=args.trainsub)
+									subsamp=args.trainsub, step=args.step, part_update=args.part_update)
 		test_dataset_obj = Dataset(data_path, 0.9, 'test', args=args, prepare_output=True, label_type='13', device = device,
-									subsamp=args.testsub)
+									subsamp=args.testsub, step=args.step, part_update=args.part_update)
 
-		"""
-		train_dataset_obj = SwissCrops(root, mode="train", device=device,  noskip=args.noskip,
-										step=args.step, trunc=args.trunc, nsamples=args.n,
-										datatype=args.swissdatatype, singlepix=args.singlepix)
-		test_dataset_obj = SwissCrops(root, mode="test", device=device,  noskip=args.noskip,
-										step=args.step, trunc=args.trunc, nsamples=args.validn,
-										datatype=args.swissdatatype, singlepix=args.singlepix) 
-		"""
-
+		
 		n_samples = min(args.n, len(train_dataset_obj))
 		n_test_samples = min( float("inf"), len(test_dataset_obj))
 		
@@ -272,26 +266,24 @@ def parse_datasets(args, device):
 		train_batch_size = min(args.batch_size, args.n)
 		test_batch_size = min(n_test_samples, validation_batch_size)
 
-		a_train_dict = train_dataset_obj[0]
-		vals = a_train_dict["observed_data"]
-		tt = a_train_dict["observed_tp"]
-		mask = a_train_dict["observed_mask"]
-		labels = a_train_dict["labels"]
+		a_data_map = train_dataset_obj[0]
+		# a_data_map := [observed_data, observed_tp, data_to_predict, tp_to_predict, observed_mask, mask_predicted_data, labels, mode]
+		vals = a_data_map[0]
+		tt = a_data_map[1]
+		mask = a_data_map[4]
+		labels = a_data_map[6]
 		
-		traindataloader = torch.utils.data.DataLoader(train_dataset_obj,batch_size=train_batch_size, shuffle=True, num_workers=12)
-		traindataloader = torch.utils.data.DataLoader(test_dataset_obj,batch_size=test_batch_size, shuffle=True, num_workers=12)
-
-		train_dataloader = FastTensorDataLoader(train_dataset_obj, batch_size=train_batch_size, subsamp=args.trainsub)
-		test_dataloader = FastTensorDataLoader(test_dataset_obj, batch_size=test_batch_size, subsamp=args.testsub)
+		train_dataloader = torch.utils.data.DataLoader(train_dataset_obj,batch_size=train_batch_size, shuffle=True, num_workers=0)
+		test_dataloader = torch.utils.data.DataLoader(test_dataset_obj,batch_size=test_batch_size, shuffle=True, num_workers=0)
 
 		data_objects = {"dataset_obj": train_dataset_obj, 
 					"train_dataloader": utils.inf_generator(train_dataloader), 
 					"test_dataloader": utils.inf_generator(test_dataloader), 
-					"input_dim": vals.size(-1),
+					"input_dim": vals.size(1),
 					"n_train_batches": len(train_dataloader),
 					"n_test_batches": len(test_dataloader),
 					"classif_per_tp": False, # We want to classify the whole sequence!!. Standard: True, #optional
-					"n_labels": train_dataloader.nclasses+1} #plus one, because there is one class that summerizes all the other classes--> "other" is "0"
+					"n_labels": train_dataset_obj.nclasses()} #plus one, because there is one class that summerizes all the other classes--> "other" is "0"
 		
 		return data_objects
 
