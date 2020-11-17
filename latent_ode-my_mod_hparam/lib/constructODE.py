@@ -14,21 +14,26 @@ import torch
 
 def get_diffeq_solver(ode_latents, ode_units, rec_layers,
 		ode_method, ode_type="linear",
-		device = torch.device("cpu")):
+		device = torch.device("cpu"), convolutional=False):
 
-	if ode_type=="linear":
-		ode_func_net = utils.create_net(ode_latents, ode_latents, 
-		n_layers = int(rec_layers), n_units = int(ode_units), nonlinear = nn.Tanh)
-	elif ode_type=="gru":
-		ode_func_net = FullGRUODECell_Autonomous(ode_latents, bias=True)
+	if convolutional:
+		ode_func_net = utils.create_conv_net(ode_latents, ode_latents, 
+			n_layers = int(rec_layers), n_units = int(ode_units), nonlinear = nn.Tanh)
 	else:
-		raise Exception("Invalid ODE-type. Choose linear or gru.")
+			
+		if ode_type=="linear":
+			ode_func_net = utils.create_net(ode_latents, ode_latents, 
+			n_layers = int(rec_layers), n_units = int(ode_units), nonlinear = nn.Tanh)
+		elif ode_type=="gru":
+			ode_func_net = FullGRUODECell_Autonomous(ode_latents, bias=True)
+		else:
+			raise Exception("Invalid ODE-type. Choose linear or gru.")
 
 	rec_ode_func = ODEFunc( input_dim = 0, latent_dim = ode_latents,
 		ode_func_net = ode_func_net, device = device).to(device)
 
 	z0_diffeq_solver = DiffeqSolver(0, rec_ode_func, ode_method, ode_latents, 
-		odeint_rtol = 1e-3, odeint_atol = 1e-4, device = device)
+		odeint_rtol = 1e-3, odeint_atol = 1e-4, device = device, convolutional=convolutional)
 
 	return z0_diffeq_solver
 

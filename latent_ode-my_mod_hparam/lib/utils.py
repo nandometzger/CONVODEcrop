@@ -106,9 +106,15 @@ def make_dataset(dataset_type = "spiral",**kwargs):
 	return dataset, chiralities
 
 
-def split_last_dim(data):
+def split_last_dim(data, conv=False):
 	last_dim = data.size()[-1]
 	last_dim = last_dim//2
+
+	if len(data.size()) == 4:
+		#Convolution case
+		last_dim = data.size()[1]
+		last_dim = last_dim//2
+		res = data[:,:last_dim,...], data[:,last_dim:,...]
 
 	if len(data.size()) == 3:
 		res = data[:,:,:last_dim], data[:,:,last_dim:]
@@ -120,7 +126,7 @@ def split_last_dim(data):
 
 def init_network_weights(net, std = 0.1, initype="ortho"):
 	for m in net.modules():
-		if isinstance(m, nn.Linear):
+		if isinstance(m, nn.Linear) or isinstance(m, nn.Conv2d) :
 			if initype=="ortho":
 				nn.init.orthogonal_(m.weight)
 			else:
@@ -233,45 +239,61 @@ def split_train_test_data_and_time(data, time_steps, train_fraq = 0.8):
 
 
 
-def get_next_batch(dataloader):
+def get_next_batch(dataloader, dataset):
 	# Make the union of all time points and perform normalization across the whole dataset
 	data_dict = dataloader.__next__()
 
 	batch_dict = get_dict_template()
 
 	#TODO: Implement case, where a batch-dict has to be composed!
+	if dataset=="swissmaps":
+		data_dict = {
+			"observed_data": data_dict[0],
+			"observed_tp": data_dict[1][0],
+			"data_to_predict": data_dict[2],
+			"tp_to_predict": data_dict[3][0],
+			"observed_mask": data_dict[4],
+			"mask_predicted_data": data_dict[5],
+			"labels": data_dict[6],
+			"mode": data_dict[7]
+		}
 
-	# remove the time points where there are no observations in this batch
-	non_missing_tp = torch.sum(data_dict["observed_data"],(0,2)) != 0.
-	batch_dict["observed_data"] = data_dict["observed_data"][:, non_missing_tp]
-	if len(data_dict["observed_tp"].shape)==2:
-		batch_dict["observed_tp"] = data_dict["observed_tp"][0,non_missing_tp]
-	else:
-		batch_dict["observed_tp"] = data_dict["observed_tp"][non_missing_tp]
-
-	# print("observed data")
-	# print(batch_dict["observed_data"].size())
-
-	if ("observed_mask" in data_dict) and (data_dict["observed_mask"] is not None):
-		batch_dict["observed_mask"] = data_dict["observed_mask"][:, non_missing_tp]
-
-	batch_dict[ "data_to_predict"] = data_dict["data_to_predict"]
-	if len(data_dict["observed_tp"].shape)==2:
-		batch_dict["tp_to_predict"] = data_dict["tp_to_predict"][0]
-	else:
+	if dataset=="swissmaps":
+		batch_dict["observed_data"] = data_dict["observed_data"]
+		batch_dict[ "data_to_predict"] = data_dict["data_to_predict"]
+		batch_dict["observed_tp"] = data_dict["observed_tp"]
 		batch_dict["tp_to_predict"] = data_dict["tp_to_predict"]
+		batch_dict["tp_to_predict"] = data_dict["tp_to_predict"]
+		batch_dict["mask_predicted_data"] = data_dict["mask_predicted_data"]
+		batch_dict["observed_mask"] = data_dict["observed_mask"]
+	else:	
+		# remove the time points where there are no observations in this batch
+		non_missing_tp = torch.sum(data_dict["observed_data"],(0,2)) != 0.
+		batch_dict["observed_data"] = data_dict["observed_data"][:, non_missing_tp]
+		if len(data_dict["observed_tp"].shape)==2:
+			batch_dict["observed_tp"] = data_dict["observed_tp"][0,non_missing_tp]
+		else:
+			batch_dict["observed_tp"] = data_dict["observed_tp"][non_missing_tp]
 
-	non_missing_tp = torch.sum(data_dict["data_to_predict"],(0,2)) != 0.
-	batch_dict["data_to_predict"] = data_dict["data_to_predict"][:, non_missing_tp]
-	if len(data_dict["observed_tp"].shape)==2:
-		batch_dict["tp_to_predict"] = data_dict["tp_to_predict"][0,non_missing_tp]
-	else:
-		batch_dict["tp_to_predict"] = data_dict["tp_to_predict"][non_missing_tp]
-	# print("data_to_predict")
-	# print(batch_dict["data_to_predict"].size())
 
-	if ("mask_predicted_data" in data_dict) and (data_dict["mask_predicted_data"] is not None):
-		batch_dict["mask_predicted_data"] = data_dict["mask_predicted_data"][:, non_missing_tp]
+		if ("observed_mask" in data_dict) and (data_dict["observed_mask"] is not None):
+			batch_dict["observed_mask"] = data_dict["observed_mask"][:, non_missing_tp]
+
+		batch_dict[ "data_to_predict"] = data_dict["data_to_predict"]
+		if len(data_dict["observed_tp"].shape)==2:
+			batch_dict["tp_to_predict"] = data_dict["tp_to_predict"][0]
+		else:
+			batch_dict["tp_to_predict"] = data_dict["tp_to_predict"]
+
+		non_missing_tp = torch.sum(data_dict["data_to_predict"],(0,2)) != 0.
+		batch_dict["data_to_predict"] = data_dict["data_to_predict"][:, non_missing_tp]
+		if len(data_dict["observed_tp"].shape)==2:
+			batch_dict["tp_to_predict"] = data_dict["tp_to_predict"][0,non_missing_tp]
+		else:
+			batch_dict["tp_to_predict"] = data_dict["tp_to_predict"][non_missing_tp]
+
+		if ("mask_predicted_data" in data_dict) and (data_dict["mask_predicted_data"] is not None):
+			batch_dict["mask_predicted_data"] = data_dict["mask_predicted_data"][:, non_missing_tp]
 
 	if ("labels" in data_dict) and (data_dict["labels"] is not None):
 		batch_dict["labels"] = data_dict["labels"]
@@ -342,6 +364,20 @@ def create_net(n_inputs, n_outputs, n_layers = 1,
 	layers.append(nonlinear())
 	layers.append(nn.Linear(n_units, n_outputs))
 	return nn.Sequential(*layers)
+
+def create_conv_net(n_inputs, n_outputs, n_layers = 1, 
+	n_units = 100, nonlinear = nn.Tanh):
+	kernel_size = 3
+	padding = int(kernel_size/2)
+	layers = [nn.Conv2d(n_inputs, n_units, kernel_size=kernel_size, stride=1, padding=padding, padding_mode='reflect')]
+	for i in range(n_layers):
+		layers.append(nonlinear())
+		layers.append(nn.Conv2d(n_units, n_units, kernel_size=kernel_size, stride=1, padding=padding, padding_mode='reflect'))
+
+	layers.append(nonlinear())
+	layers.append(nn.Conv2d(n_units, n_outputs, kernel_size=kernel_size, stride=1, padding=padding, padding_mode='reflect'))
+	return nn.Sequential(*layers)
+
 
 
 def get_item_from_pickle(pickle_file, item_name):
@@ -576,7 +612,7 @@ def compute_loss_all_batches(model,
 
 	for i in tqdm(range(n_batches)):
 		#pdb.set_trace()
-		batch_dict = get_next_batch(test_dataloader)
+		batch_dict = get_next_batch(test_dataloader, dataset=args.dataset)
 
 		results  = model.compute_all_losses(batch_dict,
 			n_traj_samples = n_traj_samples, kl_coef = kl_coef, testing=False)
@@ -674,7 +710,7 @@ def compute_loss_all_batches(model,
 					class_labels.cpu().numpy(), 
 					pred_class_id.cpu().numpy())
 			
-		if args.dataset in ["crop", "swisscrop"]:
+		if args.dataset in ["crop", "swisscrop", "swissmaps"]:
 			hard_test_labels = hard_test_labels.repeat(n_traj_samples,1,1)
 			
 			idx_not_nan = ~torch.isnan(hard_test_labels)[0,0] # Nando's edit: idx_not_nan = 1 - torch.isnan(all_test_labels)
@@ -706,7 +742,7 @@ def check_mask(data, mask):
 	# mask should contain only zeros and ones
 	assert((n_zeros + n_ones) == np.prod(list(mask.size())))
 
-	# all masked out elements should be zeros
+	# all masked out elements should be zeros (or better NaNs?)
 	assert(torch.sum(data[mask == 0.] != 0.) == 0)
 
 # Experimental of Nando:
@@ -823,7 +859,7 @@ class FastTensorDataLoader:
 			#batch = torch.index_select(t, 0, indices)
 			#pdb.set_trace()
 			data = torch.from_numpy( self.hdf5dataloader["data"][indices] ).float().to(self.dataset.device)
-			time_stamps = torch.from_numpy( self.timestamps ).to(self.dataset.device)
+			time_stamps = torch.from_numpy( self.timestamps).to(self.dataset.device)
 			mask = torch.from_numpy(  self.hdf5dataloader["mask"][indices] ).float().to(self.dataset.device)
 			labels = torch.from_numpy( self.hdf5dataloader["labels"][indices] ).float().to(self.dataset.device)
 

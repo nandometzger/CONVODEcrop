@@ -309,7 +309,7 @@ def train_it(
 			kl_coef = (1-0.99** (itr // num_batches - wait_until_kl_inc))
 		
 		for i, device in enumerate(Devices):
-			batch_dict[i] = utils.get_next_batch(Data_obj[i]["train_dataloader"])
+			batch_dict[i] = utils.get_next_batch(Data_obj[i]["train_dataloader"], args.dataset)
 		
 		for i, device in enumerate(Devices):
 			train_res[i] = Model[i].compute_all_losses(batch_dict[i], n_traj_samples = 3, kl_coef = kl_coef)
