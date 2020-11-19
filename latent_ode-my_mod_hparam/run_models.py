@@ -100,6 +100,9 @@ parser.add_argument('-RN', '--resnet', default=False,  type=bool, help="Turns th
 parser.add_argument('--rec-layers', type=int, default=2, help="Number of layers in ODE func in recognition ODE") 
 parser.add_argument('-u', '--units', type=int, default=255, help="Number of units per layer in ODE func")
 parser.add_argument('-g', '--gru-units', type=int, default=100, help="Number of units per layer in each of GRU update networks")
+parser.add_argument('-tu', '--top_units', type=int, default=100, help="Number of units in the topper network")
+parser.add_argument('-ok', '--ode_kernel', type=int, default=3, help="Kernel size in ode network")
+parser.add_argument('-k', '--kernel_size', type=int, default=1, help="Kernel size in the convolutional network")
 parser.add_argument('-RI', '--nornnimputation', default=False,  type=bool, help="If false (default), for the baseline models (vanilla RNNs), the models additionally imputes delta t, which is the time since the last observation.")
 
 parser.add_argument('--linear-classif', default=False, type=bool, help="If using a classifier, use a linear classifier instead of 1-layer NN")

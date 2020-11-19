@@ -314,6 +314,8 @@ def train_it(
 		for i, device in enumerate(Devices):
 			train_res[i] = Model[i].compute_all_losses(batch_dict[i], n_traj_samples = 3, kl_coef = kl_coef)
 		
+		#torch.autograd.set_detect_anomaly(True)
+		
 		for i, device in enumerate(Devices):
 			train_res[i]["loss"].backward()
 		
@@ -339,9 +341,11 @@ def train_it(
 				for i, device in enumerate(Devices):
 					
 					#make confusion matrix
-					cm, conf_fig = plot_confusion_matrix(label_dict[0]["correct_labels"],label_dict[0]["predict_labels"], Data_obj[0]["dataset_obj"].label_list, tensor_name='dev/cm')
-					Validationwriter[i].add_figure("Validation_Confusionmatrix", conf_fig, itr*args.batch_size)
-					
+					plot_cm = True
+					if plot_cm:
+						cm, conf_fig = plot_confusion_matrix(label_dict[0]["correct_labels"],label_dict[0]["predict_labels"], Data_obj[0]["dataset_obj"].label_list, tensor_name='dev/cm')
+						Validationwriter[i].add_figure("Validation_Confusionmatrix", conf_fig, itr*args.batch_size)
+						
 					# prepare GT labels and predictions
 					y_ref_train = torch.argmax(train_res[0]['label_predictions'], dim=2).squeeze().cpu()
 					y_pred_train = torch.argmax(batch_dict[0]['labels'], dim=1).cpu()
@@ -370,7 +374,7 @@ def train_it(
 						}, Top_ckpt_path[i])
 
 
-						utils.plot_confusion_matrix2(y_ref, y_pred, Data_obj[0]["dataset_obj"].label_list, ExperimentID[i])
+						#utils.plot_confusion_matrix2(y_ref, y_pred, Data_obj[0]["dataset_obj"].label_list, ExperimentID[i])
 						# Save trajectory here
 						#if not test_res[i]["PCA_traj"] is None:
 						#	with open( os.path.join('vis', 'traj_dict' + str(ExperimentID[i]) + '.pickle' ), 'wb') as handle:

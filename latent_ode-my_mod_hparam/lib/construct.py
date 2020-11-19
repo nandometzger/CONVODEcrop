@@ -35,7 +35,11 @@ def get_ODE_RNN_model(args, device, input_dim, n_labels, classif_per_tp):
 			resnet = args.resnet,
 			ode_type=args.ode_type, ode_units = args.units, rec_layers = args.rec_layers, ode_method = args.ode_method,
 			nornnimputation=args.nornnimputation,
-			convolutional=(args.dataset=="swissmaps")
+			convolutional=(args.dataset=="swissmaps"),
+			top_units=args.top_units,
+			part_update=args.part_update,
+			ode_kernel=args.ode_kernel,
+			kernel_size=args.kernel_size
 		).to(device)
 	else:
 		raise Exception("Number of stacked layers must be greater or equal to 1.")

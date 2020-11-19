@@ -253,12 +253,11 @@ def parse_datasets(args, device):
 		torch.multiprocessing.set_start_method('spawn', force=True)
 
 		train_dataset_obj = Dataset(data_path, 0.9, 'train', args=args, prepare_output=True, label_type='13', device = device,
-									subsamp=args.trainsub, step=args.step, part_update=args.part_update)
+									subsamp=args.trainsub, step=args.step, part_update=args.part_update, noskip=args.noskip)
 		test_dataset_obj = Dataset(data_path, 0.9, 'test', args=args, prepare_output=True, label_type='13', device = device,
-									subsamp=args.testsub, step=args.step, part_update=args.part_update)
+									subsamp=args.testsub, step=args.step, part_update=args.part_update, noskip=args.noskip)
 
-		
-		n_samples = min(args.n, len(train_dataset_obj))
+		#n_samples = min(args.n, len(train_dataset_obj))
 		n_test_samples = min( float("inf"), len(test_dataset_obj))
 		
 		#evaluation batch sizes. #Must be tuned to increase efficency of evaluation
@@ -273,8 +272,10 @@ def parse_datasets(args, device):
 		mask = a_data_map[4]
 		labels = a_data_map[6]
 		
-		train_dataloader = torch.utils.data.DataLoader(train_dataset_obj,batch_size=train_batch_size, shuffle=True, num_workers=0)
-		test_dataloader = torch.utils.data.DataLoader(test_dataset_obj,batch_size=test_batch_size, shuffle=True, num_workers=0)
+		train_dataloader = torch.utils.data.DataLoader(train_dataset_obj,batch_size=train_batch_size, shuffle=True,
+														 num_workers=0, worker_init_fn=np.random.seed(1996))
+		test_dataloader = torch.utils.data.DataLoader(test_dataset_obj,batch_size=test_batch_size, shuffle=True,
+														num_workers=0, worker_init_fn=np.random.seed(1996))
 
 		data_objects = {"dataset_obj": train_dataset_obj, 
 					"train_dataloader": utils.inf_generator(train_dataloader), 
@@ -283,7 +284,7 @@ def parse_datasets(args, device):
 					"n_train_batches": len(train_dataloader),
 					"n_test_batches": len(test_dataloader),
 					"classif_per_tp": False, # We want to classify the whole sequence!!. Standard: True, #optional
-					"n_labels": train_dataset_obj.nclasses()} #plus one, because there is one class that summerizes all the other classes--> "other" is "0"
+					"n_labels": train_dataset_obj.nclasses()+1} #plus one, because there is one class that summerizes all the other classes--> "other" is "0"
 		
 		return data_objects
 
