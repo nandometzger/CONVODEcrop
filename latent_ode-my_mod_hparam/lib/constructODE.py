@@ -1,5 +1,5 @@
 ###########################
-# Crop Classification under Varying Cloud Coverwith Neural Ordinary Differential Equations
+# Crop Classification under Varying Cloud Cover with Neural Ordinary Differential Equations
 # Author: Nando Metzger
 ###########################
 
@@ -14,11 +14,17 @@ import torch
 
 def get_diffeq_solver(ode_latents, ode_units, rec_layers,
 		ode_method, ode_type="linear",
-		device = torch.device("cpu"), convolutional=False):
+		device = torch.device("cpu"), convolutional=False,
+		ode_kernel=3):
 
+	experiment = True
 	if convolutional:
-		ode_func_net = utils.create_conv_net(ode_latents, ode_latents, 
+		if experiment:
+			ode_func_net = utils.create_net(ode_latents, ode_latents, 
 			n_layers = int(rec_layers), n_units = int(ode_units), nonlinear = nn.Tanh)
+		else:
+			ode_func_net = utils.create_conv_net(ode_latents, ode_latents, 
+			n_layers = int(rec_layers), n_units = int(ode_units), nonlinear = nn.Tanh, ode_kernel=ode_kernel)
 	else:
 			
 		if ode_type=="linear":
@@ -33,7 +39,7 @@ def get_diffeq_solver(ode_latents, ode_units, rec_layers,
 		ode_func_net = ode_func_net, device = device).to(device)
 
 	z0_diffeq_solver = DiffeqSolver(0, rec_ode_func, ode_method, ode_latents, 
-		odeint_rtol = 1e-3, odeint_atol = 1e-4, device = device, convolutional=convolutional)
+		odeint_rtol = 1e-3, odeint_atol = 1e-4, device = device, convolutional=convolutional, experiment=experiment)
 
 	return z0_diffeq_solver
 

@@ -103,7 +103,8 @@ class Encoder_z0_ODE_RNN(nn.Module):
 		z0_dim = None, RNN_update = None, 
 		n_gru_units = 100, device = torch.device("cpu"),
 		RNNcell = None, use_BN=True,
-		use_ODE = True, nornnimputation=False, convolutional=False):
+		use_ODE = True, nornnimputation=False, convolutional=False,
+		kernel_size=3):
 		
 		super(Encoder_z0_ODE_RNN, self).__init__()
 
@@ -273,7 +274,7 @@ class Encoder_z0_ODE_RNN(nn.Module):
 
 		#print("minimum step: {}".format(minimum_step))
 
-		assert(not torch.isnan(data).any())
+		#assert(not torch.isnan(data).any())
 		assert(not torch.isnan(time_steps).any())
 
 		latent_ys = []
@@ -300,11 +301,21 @@ class Encoder_z0_ODE_RNN(nn.Module):
 			#Include inplementationin case of no ODE function
 			if self.use_ODE:
 				
+				experiment = True
+				if experiment:
+					shapmem = prev_y.permute(0,2,3,1).shape
+					prev_y = prev_y.permute(0,2,3,1).reshape(-1,self.latent_dim).unsqueeze(0)
+
 				if abs(prev_t - t_i) < minimum_step:
 					#short integration, linear approximation with the gradient
 					time_points = torch.stack((prev_t, t_i))
+					
 					inc = self.z0_diffeq_solver.ode_func(prev_t, prev_y) * (t_i - prev_t)
-
+	
+					if experiment:
+						inc = inc.reshape(shapmem).permute(0,3,1,2)
+						prev_y = prev_y[0].reshape(shapmem).permute(0,3,1,2)
+										
 					assert(not torch.isnan(inc).any())
 
 					ode_sol = prev_y + inc
@@ -317,6 +328,10 @@ class Encoder_z0_ODE_RNN(nn.Module):
 					ode_sol = self.z0_diffeq_solver(prev_y, time_points)
 
 					assert(not torch.isnan(ode_sol).any())
+
+					if experiment:
+						ode_sol = ode_sol.reshape(shapmem[:3] + (n_intermediate_tp,) + (self.input_dim//2,)).permute(0,4,3,1,2)
+						prev_y = prev_y[0].reshape(shapmem).permute(0,3,1,2)
 
 				if torch.mean(ode_sol[:, :, 0, :]  - prev_y) >= 0.001:
 					print("Error: first point of the ODE is not equal to initial value")
@@ -448,7 +463,7 @@ class Encoder_z0_ODE_RNN(nn.Module):
 				if self.convolutional:
 					origshape = latent_ys.shape
 					bnshape = (-1,) + tuple(origshape[2:])
-					latent_ys_out = self.output_bn(latent_ys.reshape(bnshape)).reshape(origshape) #orig
+					latent_ys = self.output_bn(latent_ys.reshape(bnshape)).reshape(origshape) #orig
 				else:
 					latent_ys = self.output_bn(latent_ys.squeeze().permute(0,2,1)).permute(0,2,1).unsqueeze(0) #orig
 

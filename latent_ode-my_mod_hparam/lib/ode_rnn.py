@@ -118,7 +118,8 @@ class ML_ODE_RNN(Baseline):
 		include_topper = False, linear_topper = False,
 		use_BN = True, resnet = False,
 		ode_type="linear", ode_units=200, rec_layers=1, ode_method="dopri5",
-		stack_order = None, nornnimputation=False, convolutional=False):
+		stack_order = None, nornnimputation=False, convolutional=False, 
+		top_units=100, part_update=False, ode_kernel=3, kernel_size=3) :
 
 		Baseline.__init__(self, input_dim, latent_dim, device = device, 
 			obsrv_std = obsrv_std, use_binary_classif = use_binary_classif,
@@ -130,6 +131,7 @@ class ML_ODE_RNN(Baseline):
 		self.resnet = resnet
 		self.use_BN = use_BN
 		self.convolutional = convolutional
+		self.part_update = part_update
 		ode_rnn_encoder_dim = latent_dim
 
 		if ODE_sharing or RNN_sharing or self.resnet or self.include_topper:
@@ -162,21 +164,21 @@ class ML_ODE_RNN(Baseline):
 		# get the default ODE and RNN for the weightsharing
 		# ODE stuff
 		z0_diffeq_solver = get_diffeq_solver(ode_latents, ode_units, rec_layers, ode_method, ode_type="linear",
-											device=device, convolutional=convolutional)
+											device=device, convolutional=convolutional, ode_kernel=ode_kernel)
 		
 		# RNNcell
 		if self.convolutional:
 			if RNNcell=='gru':
-				RNN_update = CONVGRU_unit(latent_dim, rnn_input, n_units = n_gru_units, device=device).to(device)
+				RNN_update = CONVGRU_unit(latent_dim, rnn_input, n_units = n_gru_units, device=device, kernel_size=kernel_size).to(device)
 
 			elif RNNcell=='gru_small':
-				RNN_update = CONVGRU_standard_unit(latent_dim, rnn_input, device=device).to(device)
+				RNN_update = CONVGRU_standard_unit(latent_dim, rnn_input, device=device, kernel_size=kernel_size).to(device)
 
 			elif RNNcell=='lstm':
-				RNN_update = CONVLSTM_unit(latent_dim, rnn_input).to(device)
+				RNN_update = CONVLSTM_unit(latent_dim, rnn_input, kernel_size=kernel_size).to(device)
 
 			elif RNNcell=="star":
-				RNN_update = CONVSTAR_unit(latent_dim, rnn_input, n_units = n_gru_units).to(device)
+				RNN_update = CONVSTAR_unit(latent_dim, rnn_input, n_units = n_gru_units, kernel_size=kernel_size).to(device)
 
 			else:
 				raise Exception("Invalid RNN-cell type. Hint: expdecay not available for ODE-RNN")
@@ -227,17 +229,17 @@ class ML_ODE_RNN(Baseline):
 				if self.convolutional:
 						
 					if thisRNNcell=='gru':
-						RNN_update = CONVGRU_unit(latent_dim, vertical_rnn_input, n_units = n_gru_units, device=device).to(device)
+						RNN_update = CONVGRU_unit(latent_dim, vertical_rnn_input, n_units = n_gru_units, device=device, kernel_size=kernel_size).to(device)
 
 					elif thisRNNcell=='gru_small':
-						RNN_update = CONVGRU_standard_unit(latent_dim, vertical_rnn_input, device=device).to(device)
+						RNN_update = CONVGRU_standard_unit(latent_dim, vertical_rnn_input, device=device, kernel_size=kernel_size).to(device)
 
 					elif thisRNNcell=='lstm':
 						# two times latent dimension because of the cell state!
-						RNN_update = CONVLSTM_unit(latent_dim*2, vertical_rnn_input).to(device)
+						RNN_update = CONVLSTM_unit(latent_dim*2, vertical_rnn_input, kernel_size=kernel_size).to(device)
 
 					elif thisRNNcell=="star":
-						RNN_update = CONVSTAR_unit(latent_dim, vertical_rnn_input, n_units = n_gru_units).to(device)
+						RNN_update = CONVSTAR_unit(latent_dim, vertical_rnn_input, n_units = n_gru_units, kernel_size=kernel_size).to(device)
 
 					else:
 						raise Exception("Invalid RNN-cell type. Hint: expdecay not available for ODE-RNN")
@@ -268,7 +270,7 @@ class ML_ODE_RNN(Baseline):
 					ode_latents = int(latent_dim)
 
 				z0_diffeq_solver = get_diffeq_solver(ode_latents, ode_units, rec_layers, ode_method, ode_type="linear",
-												device=device, convolutional=convolutional)
+												device=device, convolutional=convolutional, ode_kernel=ode_kernel)
 				
 			self.Encoder0 = Encoder_z0_ODE_RNN( 
 				latent_dim = ode_rnn_encoder_dim, 
@@ -280,13 +282,13 @@ class ML_ODE_RNN(Baseline):
 				use_BN = use_BN,
 				use_ODE = use_ODE,
 				nornnimputation=nornnimputation,
-				convolutional=convolutional
+				convolutional=convolutional,
+				kernel_size=kernel_size
 			).to(device)
 
 			self.ode_gru.append( self.Encoder0 )
 		
 		# construct topper
-		kernel_size = 3
 		padding = int(kernel_size/2)
 		if self.include_topper:
 			if linear_topper:
@@ -301,21 +303,21 @@ class ML_ODE_RNN(Baseline):
 			else:
 				if self.convolutional:
 					self.topper = nn.Sequential(
-						nn.Conv2d(input_dim, 100, kernel_size=kernel_size, stride=1, padding=padding, padding_mode='reflect'),
+						nn.Conv2d(input_dim, top_units, kernel_size=kernel_size, stride=1, padding=padding, padding_mode='reflect'),
 						nn.Tanh(),
-						nn.Conv2d(100, latent_dim, kernel_size=kernel_size, stride=1, padding=padding, padding_mode='reflect'),
+						nn.Conv2d(top_units, latent_dim, kernel_size=kernel_size, stride=1, padding=padding, padding_mode='reflect'),
 						nn.Tanh(),
 						).to(device)
 				else:
 					self.topper = nn.Sequential(
-						nn.Linear(input_dim, 100),
+						nn.Linear(input_dim, top_units),
 						nn.Tanh(),
-						nn.Linear(100, latent_dim),
+						nn.Linear(top_units, latent_dim),
 						nn.Tanh(),).to(device)
 				
 			utils.init_network_weights(self.topper)
 
-			if self.convolutional:
+			if self.convolutional and (not self.part_update):
 				self.topper_bn = nn.BatchNorm2d(latent_dim)
 			else:
 				self.topper_bn = nn.BatchNorm1d(latent_dim)
@@ -380,15 +382,31 @@ class ML_ODE_RNN(Baseline):
 				# if it is the first RNN-layer, transform the dimensionality of the input down using the topper NN
 				if self.include_topper:
 					pure_data = data_and_mask[:,:, :self.input_dim]
+					mask = data_and_mask[:,:, self.input_dim:]
 
 					if self.convolutional:
 						# create tensor of topperoutput, and fill in the corresponding locations
-						data_topped = torch.zeros(n_traj, n_tp, self.latent_dim, h, w).to(self.device)
-						mask2 = torch.sum( data_and_mask[:,:,self.input_dim:].bool() , dim=(2,3,4)).nonzero()
-						if self.use_BN:
-							data_topped[mask2[:,0], mask2[:,1]] = self.topper_bn( self.topper(pure_data[mask2[:,0], mask2[:,1]]) )
+						data_topped = (torch.zeros(n_traj, n_tp, self.latent_dim, h, w)).type(torch.float32).to(self.device)
+						if self.part_update:
+							#data_topped = data_topped*torch.from_numpy(np.array([np.NaN])).to(self.device).type(torch.float32)
+
+							mask2 = torch.sum( data_and_mask[:,:,self.input_dim:].bool() , dim=(2,3,4)).nonzero()
+							mask3 = torch.sum( data_and_mask[:,:,self.input_dim:].bool() , dim=(2)).nonzero()
+
+							if self.use_BN:
+								# a bit hacky, but it has to be done this way, because we can not use batch normalization with nan values as input
+								data_topped[mask2[:,0], mask2[:,1]] = self.topper(pure_data[mask2[:,0], mask2[:,1]])
+								data_topped[mask3[:,0],mask3[:,1],:,mask3[:,2],mask3[:,3]] = self.topper_bn(data_topped[mask3[:,0],mask3[:,1],:,mask3[:,2],mask3[:,3]])
+							else:
+								data_topped[mask2[:,0], mask2[:,1]] = self.topper(pure_data[mask2[:,0], mask2[:,1]])
+						
 						else:
-							data_topped[mask2[:,0], mask2[:,1]] = self.topper(pure_data[mask2[:,0], mask2[:,1]])
+									
+							mask2 = torch.sum( data_and_mask[:,:,self.input_dim:].bool() , dim=(2,3,4)).nonzero()
+							if self.use_BN:
+								data_topped[mask2[:,0], mask2[:,1]] = self.topper_bn( self.topper(pure_data[mask2[:,0], mask2[:,1]]) )
+							else:
+								data_topped[mask2[:,0], mask2[:,1]] = self.topper(pure_data[mask2[:,0], mask2[:,1]])
 
 						# create mask with the new size
 						new_mask = data_and_mask[:,:,self.input_dim:][:,:,0][:,:,None].repeat(1,1,self.latent_dim,1,1)
@@ -466,7 +484,7 @@ class ML_ODE_RNN(Baseline):
 			else:
 				if self.use_BN:
 					if self.convolutional:
-						last_hidden = self.bn_lasthidden(last_hidden.squeeze())
+						last_hidden = self.bn_lasthidden(last_hidden)
 					else:
 						last_hidden = self.bn_lasthidden(last_hidden.squeeze()).unsqueeze(0)
 				extra_info["label_predictions"] = self.classifier(last_hidden).squeeze(-1)

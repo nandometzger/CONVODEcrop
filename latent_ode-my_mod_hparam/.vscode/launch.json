@@ -201,28 +201,31 @@
             "args": [
                 //#python3 run_models.py --niters 2 -n 11000000 -validn 300000 -b 600 --swissdatatype 2_toplabels -v 2 --ode-rnn --rnn-cell gru --stack-order gru --random-seed 6001 --stack-order gru -BN=true --topper=true --dataset swisscrop --step 2 --trunc 9
                 "--niters", "10",
-                "-n", "11000000",
-                "-validn", "400000",
+                "-n", "3000",
+                "-validn", "30",
                 "--dataset", "swissmaps",
                 "--swissdatatype", "2",
-                "--val_freq", "10",
-                "-b", "3",
+                "--val_freq", "1",
+                "-b", "1",
                 "--ode-rnn",
                 "--optimizer", "adam",
                 "--random-seed", "6001",
                 "--stack-order", "ode_rnn",
-                "--lr", "0.006",
+                "--lr", "0.0076",
                 //"--lrdecay", "0.9995",
                 "-g", "100",
-                "-l", "85",
+                "-l", "80",
                 "-u", "255",
                 "-v", "2",
+                "-tu", "100",
+                "--ode_kernel", "1",
+                "--kernel_size", "1",
                 "--topper", "true",
-                //"--linear-topper", "true",
+                "--linear-topper", "true", //TODO: remove later
                 "-BN", "true",
                 "--step", "2",
                 "--trunc", "9",
-                "--part_update"
+                //"--part_update"
             ]
         },
         {
@@ -234,28 +237,31 @@
             "args": [
                 //#python3 run_models.py --niters 2 -n 11000000 -validn 300000 -b 600 --swissdatatype 2_toplabels -v 2 --ode-rnn --rnn-cell gru --stack-order gru --random-seed 6001 --stack-order gru -BN=true --topper=true --dataset swisscrop --step 2 --trunc 9
                 "--niters", "1",
-                "-n", "11000000",
-                "-validn", "400000",
+                "-n", "900",
+                "-validn", "40",
                 "--dataset", "swissmaps",
                 "--swissdatatype", "2",
-                "--val_freq", "100",
-                "-b", "3",
+                "--val_freq", "5",
+                "-b", "2",
                 "--ode-rnn",
                 "--optimizer", "adam",
                 "--random-seed", "6001",
                 "--stack-order", "gru",
-                "--lr", "0.006",
+                "--lr", "0.0009",
                 //"--lrdecay", "0.9995",
-                "-g", "100",
-                "-l", "85",
-                "-u", "255",
+                "-g", "50",
+                "-l", "40",
+                "-u", "40",
                 "-v", "2",
+                "-tu", "20",
+                "--kernel_size", "3",
                 "--topper", "true",
                 //"--linear-topper", "true",
                 "-BN", "true",
                 "--step", "2",
                 "--trunc", "9",
-                "-RI", "true"
+                "-RI", "true",
+                "--part_update"
             ]
         }
     ]

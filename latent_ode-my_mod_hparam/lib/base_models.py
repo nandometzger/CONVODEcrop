@@ -168,7 +168,6 @@ class Baseline(nn.Module):
 					info["label_predictions"], 
 					batch_dict["labels"])
 			else:
-				#TODO: Make ready for convolutioins!!!
 				ce_loss = compute_multiclass_CE_loss(
 					info["label_predictions"], 
 					batch_dict["labels"],

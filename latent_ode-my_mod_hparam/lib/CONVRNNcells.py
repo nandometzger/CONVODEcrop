@@ -26,14 +26,14 @@ class CONVSTAR_unit(nn.Module):
 	"""
 
 	def __init__(self, hidden_size, input_size,
-		n_units=0, bias=True, use_BN=False):
+		n_units=0, bias=True, use_BN=False, kernel_size=3):
 		super(CONVSTAR_unit, self).__init__()
 
 		self.input_size = input_size
 		self.hidden_size = hidden_size
 		self.bias = bias
 		
-		kernel_size = 3
+		#kernel_size = 3
 		padding = int(kernel_size/2)
 
 		if n_units==0:
@@ -140,10 +140,11 @@ class CONVGRU_unit(nn.Module):
 		reset_gate = None,
 		new_state_net = None,
 		n_units = 100,
-		device = torch.device("cpu")):
+		device = torch.device("cpu"),
+		kernel_size=3):
 		super(CONVGRU_unit, self).__init__()
 
-		kernel_size = 3
+		#kernel_size = 3
 		padding = int(kernel_size/2)
 
 		if update_gate is None:
@@ -195,17 +196,17 @@ class CONVGRU_unit(nn.Module):
 
 		if masked_update:
 			# IMPORTANT: assumes that x contains both data and mask
-			# update only the hidden states for hidden state only if at least one feature is present for the current time point
+			
 			n_data_dims = x.size(1)//2
 			mask = x[:, n_data_dims:]
-			utils.check_mask(x[:, :n_data_dims], mask)
-			
-			mask = (torch.sum(mask, -1, keepdim = True) > 0).float()
+
+			filtermask = mask.sum((0,1))!=0
+			#mask = (torch.sum(mask, -1, keepdim = True) > 0).float()
 
 			assert(not torch.isnan(mask).any())
 
-			new_y = mask * new_y + (1-mask) * y_mean
-			new_y_std = mask * new_y_std + (1-mask) * y_std
+			new_y = filtermask * new_y + (~filtermask) * y_mean
+			new_y_std = filtermask * new_y_std + (~filtermask)  * y_std
 
 			if torch.isnan(new_y).any():
 				print("new_y is nan!")
@@ -224,10 +225,11 @@ class CONVGRU_standard_unit(nn.Module):
 		update_gate = None,
 		reset_gate = None,
 		new_state_net = None,
-		device = torch.device("cpu")):
+		device = torch.device("cpu"),
+		kernel_size=3):
 		super(CONVGRU_standard_unit, self).__init__()
 
-		kernel_size = 3
+		#kernel_size = 3
 		padding = int(kernel_size/2)
 
 		if update_gate is None:
@@ -297,14 +299,13 @@ class CONVGRU_standard_unit(nn.Module):
 
 
 
-
 # Implement a LSTM cell
 # LSTM-unit code inspired by Ricard's answer to https://stackoverflow.com/questions/50168224/does-a-clean-and-extendable-lstm-implementation-exists-in-pytorch
 class CONVLSTM_unit(nn.Module):
-	def __init__(self, hidden_size, input_size):
+	def __init__(self, hidden_size, input_size, kernel_size=3):
 		super(CONVLSTM_unit, self).__init__()
 
-		kernel_size = 3
+		#kernel_size = 3
 		padding = int(kernel_size/2)
 
 		self.input_size = input_size

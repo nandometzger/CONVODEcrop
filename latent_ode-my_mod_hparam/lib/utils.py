@@ -366,8 +366,8 @@ def create_net(n_inputs, n_outputs, n_layers = 1,
 	return nn.Sequential(*layers)
 
 def create_conv_net(n_inputs, n_outputs, n_layers = 1, 
-	n_units = 100, nonlinear = nn.Tanh):
-	kernel_size = 3
+	n_units = 100, nonlinear = nn.Tanh, ode_kernel=3):
+	kernel_size = ode_kernel
 	padding = int(kernel_size/2)
 	layers = [nn.Conv2d(n_inputs, n_units, kernel_size=kernel_size, stride=1, padding=padding, padding_mode='reflect')]
 	for i in range(n_layers):
@@ -630,7 +630,8 @@ def compute_loss_all_batches(model,
 				results["label_predictions"].max(-1)[1]  ), 1)
 			hard_test_labels = torch.cat((hard_test_labels, 
 				batch_dict["labels"].max(-1)[1]  ), 0)
-		
+
+
 		for key in total.keys(): 
 			if key in results:
 				var = results[key]
@@ -744,6 +745,19 @@ def check_mask(data, mask):
 
 	# all masked out elements should be zeros (or better NaNs?)
 	assert(torch.sum(data[mask == 0.] != 0.) == 0)
+
+def check_mask_nan(data, mask):
+	#check that "mask" argument indeed contains a mask for data
+	n_zeros = torch.sum(mask == 0.).cpu().numpy()
+	n_ones = torch.sum(mask == 1.).cpu().numpy()
+
+	# mask should contain only zeros and ones
+	assert((n_zeros + n_ones) == np.prod(list(mask.size())))
+
+	# all masked out elements should be zeros (or better NaNs?)
+	#assert(torch.sum(data[mask == 0.] != 0.) == torch.nan)
+	#assert( torch.isnan(torch.sum(data[mask == 0.] != 0.)))
+
 
 # Experimental of Nando:
 class FastTensorDataLoader:
@@ -878,8 +892,6 @@ class FastTensorDataLoader:
 			mask = torch.from_numpy(self.hdf5dataloader["mask"][start:stop] ).float()#.to(self.dataset.device)
 			labels = torch.from_numpy( self.hdf5dataloader["labels"][start:stop] ).float()#.to(self.dataset.device)
 
-
-		
 			data_dict = {
 				"data": data[:,::self.step,:self.feature_trunc].to(self.dataset.device), 
 				"time_steps": time_stamps[::self.step].to(self.dataset.device),
