@@ -206,8 +206,7 @@
                 "--dataset", "swissmaps",
                 "--swissdatatype", "2",
                 "--val_freq", "5",
-
-                "-b", "1",
+                "-b", "2",
                 "--ode-rnn",
                 "--optimizer", "adam",
                 "--random-seed", "6001",
@@ -227,7 +226,7 @@
                 "-BN", "true",
                 "--step", "2",
                 "--trunc", "9",
-                "--part-update"
+                "--part-update", "True"
 
             ]
         },
@@ -264,7 +263,7 @@
                 "--step", "2",
                 "--trunc", "9",
                 "-RI", "true",
-                "--part-update"
+                "--part-update", "True"
             ]
         }
     ]
