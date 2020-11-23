@@ -1026,13 +1026,12 @@ class Dataset(torch.utils.data.Dataset):
 		if not self.untile:
 			if self.prepare_output:
 				# prepare to feed it to conv-rnns
-
 				
 				data_full = torch.from_numpy( X ).float()#.to(self.dataset.device)
 				time_stamps = torch.from_numpy( self.timestamps )#.to(self.dataset.device)
 				cloud_cover = torch.from_numpy(cloud_cover ).float()#.to(self.dataset.device)
 				labels = torch.from_numpy( target ).float()#.to(self.dataset.device)
-				
+			
 				# TODO: normalization!
 				if self.normalize:
 					xshape = data_full.shape

@@ -73,6 +73,7 @@ parser.add_argument('--singlepix', default=False,  type=bool, help="Applies batc
 parser.add_argument('--noskip', action='store_true', help="If the flag is step, the dataloader will not sort out cloudy frames, and all the frames will be taken for the training.")
 parser.add_argument('-PU', '--part-update', default=False, type=bool, help="only for swissmaps data. Update only parts of the hidden state that are observed. Usefull for partly observed maps.")
 
+
 parser.add_argument('-c', '--cut-tp', type=int, default=None, help="NOT IN USE! Cut out the section of the timeline of the specified length (in number of points)."
 	"Used for periodic function demo.")
 

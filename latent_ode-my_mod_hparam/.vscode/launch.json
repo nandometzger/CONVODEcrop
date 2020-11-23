@@ -206,6 +206,7 @@
                 "--dataset", "swissmaps",
                 "--swissdatatype", "2",
                 "--val_freq", "5",
+
                 "-b", "1",
                 "--ode-rnn",
                 "--optimizer", "adam",
@@ -227,6 +228,7 @@
                 "--step", "2",
                 "--trunc", "9",
                 "--part-update"
+
             ]
         },
         {
