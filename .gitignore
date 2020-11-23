@@ -3,4 +3,5 @@ latent_ode-my_mod_hparam/wandb
 latent_ode-my_mod_hparam/results
 latent_ode-my_mod_hparam/vis
 latent_ode-my_mod_hparam/logs
-latent_ode-my_mod_hparam/runs/
+latent_ode-my_mod_hparam/runs
+latent_ode-my_mod_hparam/experiments
