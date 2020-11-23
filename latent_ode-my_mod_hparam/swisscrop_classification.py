@@ -1027,12 +1027,16 @@ class Dataset(torch.utils.data.Dataset):
 			if self.prepare_output:
 				# prepare to feed it to conv-rnns
 
-				# TODO: normalization!
 				
 				data_full = torch.from_numpy( X ).float()#.to(self.dataset.device)
 				time_stamps = torch.from_numpy( self.timestamps )#.to(self.dataset.device)
 				cloud_cover = torch.from_numpy(cloud_cover ).float()#.to(self.dataset.device)
 				labels = torch.from_numpy( target ).float()#.to(self.dataset.device)
+				
+				# TODO: normalization!
+				if self.normalize:
+					xshape = data_full.shape
+					data_full == (data_full-torch.tensor(self.means).unsqueeze(0).unsqueeze(2).unsqueeze(3).repeat(xshape[0],1,xshape[2],xshape[3]))/torch.tensor(self.stds).unsqueeze(0).unsqueeze(2).unsqueeze(3).repeat(xshape[0],1,xshape[2],xshape[3])
 				
 				# truncate bad weather
 				cloud_mask = (cloud_cover>self.cloud_thresh).type(torch.float32)

@@ -202,30 +202,31 @@
                 //#python3 run_models.py --niters 2 -n 11000000 -validn 300000 -b 600 --swissdatatype 2_toplabels -v 2 --ode-rnn --rnn-cell gru --stack-order gru --random-seed 6001 --stack-order gru -BN=true --topper=true --dataset swisscrop --step 2 --trunc 9
                 "--niters", "10",
                 "-n", "3000",
-                "-validn", "30",
+                "-validn", "40",
                 "--dataset", "swissmaps",
                 "--swissdatatype", "2",
-                "--val_freq", "1",
+                "--val_freq", "5",
                 "-b", "1",
                 "--ode-rnn",
                 "--optimizer", "adam",
                 "--random-seed", "6001",
                 "--stack-order", "ode_rnn",
-                "--lr", "0.0076",
+                "--lr", "0.0009",
                 //"--lrdecay", "0.9995",
-                "-g", "100",
-                "-l", "80",
-                "-u", "255",
+                "-g", "50",
+                "-l", "30",
+                "-u", "1",
+                "--rec-layers", "1",
                 "-v", "2",
-                "-tu", "100",
+                "-tu", "20",
                 "--ode_kernel", "1",
-                "--kernel_size", "1",
+                "--kernel_size", "3",
                 "--topper", "true",
-                "--linear-topper", "true", //TODO: remove later
+                //"--linear-topper", "true", //TODO: remove later
                 "-BN", "true",
                 "--step", "2",
                 "--trunc", "9",
-                //"--part_update"
+                "--part-update"
             ]
         },
         {
@@ -236,8 +237,8 @@
             "console": "integratedTerminal",
             "args": [
                 //#python3 run_models.py --niters 2 -n 11000000 -validn 300000 -b 600 --swissdatatype 2_toplabels -v 2 --ode-rnn --rnn-cell gru --stack-order gru --random-seed 6001 --stack-order gru -BN=true --topper=true --dataset swisscrop --step 2 --trunc 9
-                "--niters", "1",
-                "-n", "900",
+                "--niters", "10",
+                "-n", "3000",
                 "-validn", "40",
                 "--dataset", "swissmaps",
                 "--swissdatatype", "2",
@@ -250,7 +251,7 @@
                 "--lr", "0.0009",
                 //"--lrdecay", "0.9995",
                 "-g", "50",
-                "-l", "40",
+                "-l", "30",
                 "-u", "40",
                 "-v", "2",
                 "-tu", "20",
@@ -261,7 +262,7 @@
                 "--step", "2",
                 "--trunc", "9",
                 "-RI", "true",
-                "--part_update"
+                "--part-update"
             ]
         }
     ]
