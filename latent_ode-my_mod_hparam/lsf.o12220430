@@ -1,0 +1,650 @@
+wandb: Starting wandb agent 🕵️
+2020-11-23 13:25:02,867 - wandb.wandb_agent - INFO - Running runs: []
+2020-11-23 13:25:03,240 - wandb.wandb_agent - INFO - Agent received command: run
+2020-11-23 13:25:03,262 - wandb.wandb_agent - INFO - Agent starting run with config:
+	lr: 0.000225
+	units: 4
+2020-11-23 13:25:03,529 - wandb.wandb_agent - INFO - About to run command: /usr/bin/env python run_models.py --niters=2 -n=3000 -validn=80 --dataset=swissmaps --swissdatatype=2 --val_freq=50 -b=2 --lr=0.0009 --optimizer=adam --ode-rnn --rnn-cell=gru --random-seed=6001 --stack-order=ode_rnn --rec-layers=1 -u=1 -g=50 -l=30 -tu=20 -v=2 --ode_kernel=1 --kernel_size=3 --topper=True -BN=True --step=2 --trunc=9 -PU=True --lr=0.000225 --units=4
+2020-11-23 13:25:08,545 - wandb.wandb_agent - INFO - Running runs: ['9lho6umv']
+wandb: Tracking run with wandb version 0.9.2
+wandb: Wandb version 0.10.11 is available!  To upgrade, please run:
+wandb:  $ pip install wandb --upgrade
+wandb: Run data is saved locally in wandb/run-20201123_122503-9lho6umv
+wandb: Syncing run leafy-sweep-3
+wandb: ⭐️ View project at https://app.wandb.ai/cropteam/odecropclassification
+wandb: 🧹 View sweep at https://app.wandb.ai/cropteam/odecropclassification/sweeps/hf9xgnjp
+wandb: 🚀 View run at https://app.wandb.ai/cropteam/odecropclassification/runs/9lho6umv
+wandb: Run `wandb off` to turn off syncing.
+
+Couldn't import umap
+I'm counting gpu's:  1
+Means I will train  1  models, with different random seeds
+My Devices:  ['cuda:0']
+Sampling dataset of 3000 training examples
+  0% 0/1 [00:00<?, ?trial/s, best loss=?]                                         Testing hyperparameters:
+  0% 0/1 [00:00<?, ?trial/s, best loss=?]                                         ExperimentID
+  0% 0/1 [00:00<?, ?trial/s, best loss=?]                                         [7519000]
+  0% 0/1 [00:00<?, ?trial/s, best loss=?]                                         /cluster/scratch/metzgern/ODEcrop/Swisscrop/raw
+  0% 0/1 [00:00<?, ?trial/s, best loss=?]                                         dataroot: /cluster/scratch/metzgern/ODEcrop/Swisscrop/raw
+  0% 0/1 [00:00<?, ?trial/s, best loss=?]                                         Dataset size: 
+  0% 0/1 [00:09<?, ?trial/s, best loss=?]                                         27977
+  0% 0/1 [00:09<?, ?trial/s, best loss=?]                                         Valid dataset size: 
+  0% 0/1 [00:09<?, ?trial/s, best loss=?]                                         2976
+  0% 0/1 [00:09<?, ?trial/s, best loss=?]                                         Sequence length: 
+  0% 0/1 [00:09<?, ?trial/s, best loss=?]                                         142
+  0% 0/1 [00:09<?, ?trial/s, best loss=?]                                         Spatial size: 
+  0% 0/1 [00:09<?, ?trial/s, best loss=?]                                         (24, 24)
+  0% 0/1 [00:09<?, ?trial/s, best loss=?]                                         Number of classes: 
+  0% 0/1 [00:09<?, ?trial/s, best loss=?]                                         52
+  0% 0/1 [00:09<?, ?trial/s, best loss=?]                                         Number of classes - local-1: 
+  0% 0/1 [00:09<?, ?trial/s, best loss=?]                                         6
+  0% 0/1 [00:09<?, ?trial/s, best loss=?]                                         Number of classes - local-2: 
+  0% 0/1 [00:09<?, ?trial/s, best loss=?]                                         20
+  0% 0/1 [00:09<?, ?trial/s, best loss=?]                                         Number of filed instance: 
+  0% 0/1 [00:10<?, ?trial/s, best loss=?]                                         116095
+  0% 0/1 [00:10<?, ?trial/s, best loss=?]                                         Dataset size: 
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         27977
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         Valid dataset size: 
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         997
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         Sequence length: 
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         142
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         Spatial size: 
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         (24, 24)
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         Number of classes: 
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         52
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         Number of classes - local-1: 
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         6
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         Number of classes - local-2: 
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         20
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         Number of filed instance: 
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         116095
+  0% 0/1 [00:19<?, ?trial/s, best loss=?]                                         runs/expID7519000_TRAINode_ns:3000_ba:2_ode-units:4_gru-uts:50_lats:30_rec-lay:1_solver:euler_seed:6001_optim:adam_stackin:1['ode_rnn']_BN
+  0% 0/1 [00:23<?, ?trial/s, best loss=?]run_models.py --niters=2 -n=3000 -validn=80 --dataset=swissmaps --swissdatatype=2 --val_freq=50 -b=2 --lr=0.0009 --optimizer=adam --ode-rnn --rnn-cell=gru --random-seed=6001 --stack-order=ode_rnn --rec-layers=1 -u=1 -g=50 -l=30 -tu=20 -v=2 --ode_kernel=1 --kernel_size=3 --topper=True -BN=True --step=2 --trunc=9 -PU=True --lr=0.000225 --units=4
+
+  0%|                                                                                                                                  | 0/2976 [00:00<?, ?it/s]
+Train Ac: 12.587 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|                                               | 0/2976 [00:01<?, ?it/s]
+Train Ac: 12.587 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|                                       | 1/2976 [00:01<52:40,  1.06s/it]
+Train Ac: 38.021 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|                                       | 1/2976 [00:02<52:40,  1.06s/it]
+Train Ac: 38.021 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|                                       | 2/2976 [00:02<52:17,  1.06s/it]
+Train Ac: 13.715 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|                                       | 2/2976 [00:03<52:17,  1.06s/it]
+Train Ac: 13.715 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|                                       | 3/2976 [00:03<50:48,  1.03s/it]
+Train Ac: 31.597 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|                                       | 3/2976 [00:03<50:48,  1.03s/it]
+Train Ac: 31.597 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|                                       | 4/2976 [00:03<47:52,  1.03it/s]
+Train Ac: 45.920 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|                                       | 4/2976 [00:04<47:52,  1.03it/s]
+Train Ac: 45.920 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|                                       | 5/2976 [00:04<48:05,  1.03it/s]
+Train Ac: 0.000 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|                                        | 5/2976 [00:05<48:05,  1.03it/s]
+Train Ac: 0.000 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|                                        | 6/2976 [00:05<47:46,  1.04it/s]
+Train Ac: 59.983 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|                                       | 6/2976 [00:07<47:46,  1.04it/s]
+Train Ac: 59.983 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|                                       | 7/2976 [00:07<53:12,  1.08s/it]
+Train Ac: 17.708 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|                                       | 7/2976 [00:08<53:12,  1.08s/it]
+Train Ac: 17.708 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|1                                      | 8/2976 [00:08<49:55,  1.01s/it]
+Train Ac: 21.701 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|1                                      | 8/2976 [00:09<49:55,  1.01s/it]
+Train Ac: 21.701 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|1                                      | 9/2976 [00:09<50:10,  1.01s/it]
+Train Ac: 30.295 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|1                                      | 9/2976 [00:09<50:10,  1.01s/it]
+Train Ac: 30.295 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|1                                     | 10/2976 [00:09<49:10,  1.01it/s]
+Train Ac: 38.021 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|1                                     | 10/2976 [00:11<49:10,  1.01it/s]
+Train Ac: 38.021 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|1                                     | 11/2976 [00:11<50:04,  1.01s/it]
+Train Ac: 15.972 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|1                                     | 11/2976 [00:12<50:04,  1.01s/it]
+Train Ac: 15.972 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|1                                     | 12/2976 [00:12<49:28,  1.00s/it]
+Train Ac: 9.462 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|1                                      | 12/2976 [00:12<49:28,  1.00s/it]
+Train Ac: 9.462 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|1                                      | 13/2976 [00:12<49:02,  1.01it/s]
+Train Ac: 9.288 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|1                                      | 13/2976 [00:14<49:02,  1.01it/s]
+Train Ac: 9.288 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|1                                      | 14/2976 [00:14<51:48,  1.05s/it]
+Train Ac: 14.497 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   0%|1                                     | 14/2976 [00:15<51:48,  1.05s/it]
+Train Ac: 14.497 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|1                                     | 15/2976 [00:15<50:40,  1.03s/it]
+Train Ac: 18.229 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|1                                     | 15/2976 [00:16<50:40,  1.03s/it]
+Train Ac: 18.229 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 16/2976 [00:16<50:59,  1.03s/it]
+Train Ac: 25.781 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 16/2976 [00:17<50:59,  1.03s/it]
+Train Ac: 25.781 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 17/2976 [00:17<49:25,  1.00s/it]
+Train Ac: 18.490 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 17/2976 [00:18<49:25,  1.00s/it]
+Train Ac: 18.490 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 18/2976 [00:18<48:35,  1.01it/s]
+Train Ac: 24.653 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 18/2976 [00:19<48:35,  1.01it/s]
+Train Ac: 24.653 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 19/2976 [00:19<50:44,  1.03s/it]
+Train Ac: 43.490 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 19/2976 [00:20<50:44,  1.03s/it]
+Train Ac: 43.490 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 20/2976 [00:20<51:02,  1.04s/it]
+Train Ac: 33.767 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 20/2976 [00:21<51:02,  1.04s/it]
+Train Ac: 33.767 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 21/2976 [00:21<50:55,  1.03s/it]
+Train Ac: 10.764 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 21/2976 [00:22<50:55,  1.03s/it]
+Train Ac: 10.764 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 22/2976 [00:22<49:38,  1.01s/it]
+Train Ac: 25.781 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 22/2976 [00:23<49:38,  1.01s/it]
+Train Ac: 25.781 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 23/2976 [00:23<49:45,  1.01s/it]
+Train Ac: 26.736 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|2                                     | 23/2976 [00:24<49:45,  1.01s/it]
+Train Ac: 26.736 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 24/2976 [00:24<51:07,  1.04s/it]
+Train Ac: 45.747 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 24/2976 [00:25<51:07,  1.04s/it]
+Train Ac: 45.747 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 25/2976 [00:25<49:44,  1.01s/it]
+Train Ac: 21.788 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 25/2976 [00:26<49:44,  1.01s/it]
+Train Ac: 21.788 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 26/2976 [00:26<52:44,  1.07s/it]
+Train Ac: 32.378 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 26/2976 [00:27<52:44,  1.07s/it]
+Train Ac: 32.378 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 27/2976 [00:27<52:13,  1.06s/it]
+Train Ac: 37.413 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 27/2976 [00:28<52:13,  1.06s/it]
+Train Ac: 37.413 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 28/2976 [00:28<52:07,  1.06s/it]
+Train Ac: 23.872 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 28/2976 [00:29<52:07,  1.06s/it]
+Train Ac: 23.872 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 29/2976 [00:29<54:41,  1.11s/it]
+Train Ac: 45.399 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 29/2976 [00:30<54:41,  1.11s/it]
+Train Ac: 45.399 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 30/2976 [00:30<52:28,  1.07s/it]
+Train Ac: 60.069 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 30/2976 [00:31<52:28,  1.07s/it]
+Train Ac: 60.069 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 31/2976 [00:31<53:38,  1.09s/it]
+Train Ac: 48.698 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|3                                     | 31/2976 [00:32<53:38,  1.09s/it]
+Train Ac: 48.698 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                     | 32/2976 [00:32<52:08,  1.06s/it]
+Train Ac: 52.344 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                     | 32/2976 [00:33<52:08,  1.06s/it]
+Train Ac: 52.344 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                     | 33/2976 [00:33<51:47,  1.06s/it]
+Train Ac: 8.681 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                      | 33/2976 [00:34<51:47,  1.06s/it]
+Train Ac: 8.681 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                      | 34/2976 [00:34<49:49,  1.02s/it]
+Train Ac: 13.021 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                     | 34/2976 [00:36<49:49,  1.02s/it]
+Train Ac: 13.021 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                     | 35/2976 [00:36<53:55,  1.10s/it]
+Train Ac: 43.229 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                     | 35/2976 [00:37<53:55,  1.10s/it]
+Train Ac: 43.229 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                     | 36/2976 [00:37<51:28,  1.05s/it]
+Train Ac: 17.101 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                     | 36/2976 [00:37<51:28,  1.05s/it]
+Train Ac: 17.101 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                     | 37/2976 [00:37<48:12,  1.02it/s]
+Train Ac: 15.451 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                     | 37/2976 [00:39<48:12,  1.02it/s]
+Train Ac: 15.451 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                     | 38/2976 [00:39<51:20,  1.05s/it]
+Train Ac: 30.903 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                     | 38/2976 [00:40<51:20,  1.05s/it]
+Train Ac: 30.903 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                     | 39/2976 [00:40<53:44,  1.10s/it]
+Train Ac: 17.882 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|4                                     | 39/2976 [00:41<53:44,  1.10s/it]
+Train Ac: 17.882 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|5                                     | 40/2976 [00:41<52:07,  1.07s/it]
+Train Ac: 43.750 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|5                                     | 40/2976 [00:42<52:07,  1.07s/it]
+Train Ac: 43.750 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|5                                     | 41/2976 [00:42<53:38,  1.10s/it]
+Train Ac: 34.722 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|5                                     | 41/2976 [00:43<53:38,  1.10s/it]
+Train Ac: 34.722 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|5                                     | 42/2976 [00:43<50:55,  1.04s/it]
+Train Ac: 27.691 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|5                                     | 42/2976 [00:44<50:55,  1.04s/it]
+Train Ac: 27.691 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|5                                     | 43/2976 [00:44<49:53,  1.02s/it]
+Train Ac: 14.757 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|5                                     | 43/2976 [00:45<49:53,  1.02s/it]
+Train Ac: 14.757 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|5                                     | 44/2976 [00:45<48:13,  1.01it/s]
+Train Ac: 56.250 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   1%|5                                     | 44/2976 [00:46<48:13,  1.01it/s]
+Train Ac: 56.250 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   2%|5                                     | 45/2976 [00:46<47:33,  1.03it/s]
+Train Ac: 49.826 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   2%|5                                     | 45/2976 [00:47<47:33,  1.03it/s]
+Train Ac: 49.826 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   2%|5                                     | 46/2976 [00:47<49:31,  1.01s/it]
+Train Ac: 40.365 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   2%|5                                     | 46/2976 [00:48<49:31,  1.01s/it]
+Train Ac: 40.365 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   2%|6                                     | 47/2976 [00:48<48:59,  1.00s/it]
+Train Ac: 19.618 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   2%|6                                     | 47/2976 [00:49<48:59,  1.00s/it]
+Train Ac: 19.618 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   2%|6                                     | 48/2976 [00:49<48:49,  1.00s/it]
+Train Ac: 38.021 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   2%|6                                     | 48/2976 [00:50<48:49,  1.00s/it]
+Train Ac: 38.021 %  |  Test Ac: 0.000 %, Peak Test Ac.: 0.000 % (at 0 batches)  |:   2%|6                                     | 49/2976 [00:50<48:15,  1.01it/s]
+  0%|          | 0/8 [00:00<?, ?it/s]
+[A
+ 12%|#2        | 1/8 [00:02<00:19,  2.84s/it]
+[A
+ 25%|##5       | 2/8 [00:05<00:16,  2.71s/it]
+[A
+ 38%|###7      | 3/8 [00:07<00:13,  2.68s/it]
+[A
+ 50%|#####     | 4/8 [00:09<00:09,  2.41s/it]
+[A
+ 62%|######2   | 5/8 [00:11<00:07,  2.39s/it]
+[A
+ 75%|#######5  | 6/8 [00:13<00:04,  2.22s/it]
+[A
+ 88%|########7 | 7/8 [00:15<00:02,  2.19s/it]
+[A
+100%|##########| 8/8 [00:18<00:00,  2.24s/it]
+[A
+100%|##########| 8/8 [00:18<00:00,  2.29s/it]
+/cluster/home/metzgern/.local/lib/python3.7/site-packages/sklearn/metrics/_classification.py:1221: UndefinedMetricWarning: Recall is ill-defined and being set to 0.0 in labels with no true samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+
+/cluster/home/metzgern/.local/lib/python3.7/site-packages/sklearn/metrics/_classification.py:1221: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+  _warn_prf(average, modifier, msg_start, len(result))
+
+Train Ac: 29.601 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|5                                  | 49/2976 [01:10<48:15,  1.01it/s]
+Train Ac: 29.601 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|5                                | 50/2976 [01:10<5:36:07,  6.89s/it]
+Train Ac: 16.753 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|5                                | 50/2976 [01:11<5:36:07,  6.89s/it]
+Train Ac: 16.753 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|5                                | 51/2976 [01:11<4:07:54,  5.09s/it]
+Train Ac: 19.097 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|5                                | 51/2976 [01:12<4:07:54,  5.09s/it]
+Train Ac: 19.097 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|5                                | 52/2976 [01:12<3:06:59,  3.84s/it]
+Train Ac: 43.576 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|5                                | 52/2976 [01:13<3:06:59,  3.84s/it]
+Train Ac: 43.576 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|5                                | 53/2976 [01:13<2:27:12,  3.02s/it]
+Train Ac: 21.875 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|5                                | 53/2976 [01:14<2:27:12,  3.02s/it]
+Train Ac: 21.875 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|5                                | 54/2976 [01:14<1:57:34,  2.41s/it]
+Train Ac: 30.295 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|5                                | 54/2976 [01:16<1:57:34,  2.41s/it]
+Train Ac: 30.295 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|6                                | 55/2976 [01:16<1:41:41,  2.09s/it]
+Train Ac: 37.587 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|6                                | 55/2976 [01:17<1:41:41,  2.09s/it]
+Train Ac: 37.587 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|6                                | 56/2976 [01:17<1:25:29,  1.76s/it]
+Train Ac: 9.809 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|6                                 | 56/2976 [01:18<1:25:29,  1.76s/it]
+Train Ac: 9.809 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|6                                 | 57/2976 [01:18<1:13:55,  1.52s/it]
+Train Ac: 29.167 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|6                                | 57/2976 [01:19<1:13:55,  1.52s/it]
+Train Ac: 29.167 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|6                                | 58/2976 [01:19<1:07:40,  1.39s/it]
+Train Ac: 13.542 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|6                                | 58/2976 [01:20<1:07:40,  1.39s/it]
+Train Ac: 13.542 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|6                                  | 59/2976 [01:20<59:26,  1.22s/it]
+Train Ac: 45.139 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|6                                  | 59/2976 [01:21<59:26,  1.22s/it]
+Train Ac: 45.139 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                  | 60/2976 [01:21<55:56,  1.15s/it]
+Train Ac: 18.229 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                  | 60/2976 [01:22<55:56,  1.15s/it]
+Train Ac: 18.229 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                  | 61/2976 [01:22<54:14,  1.12s/it]
+Train Ac: 27.691 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                  | 61/2976 [01:23<54:14,  1.12s/it]
+Train Ac: 27.691 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                  | 62/2976 [01:23<52:22,  1.08s/it]
+Train Ac: 21.615 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                  | 62/2976 [01:24<52:22,  1.08s/it]
+Train Ac: 21.615 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                  | 63/2976 [01:24<53:20,  1.10s/it]
+Train Ac: 19.618 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                  | 63/2976 [01:25<53:20,  1.10s/it]
+Train Ac: 19.618 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                | 64/2976 [01:25<1:02:19,  1.28s/it]
+Train Ac: 25.174 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                | 64/2976 [01:27<1:02:19,  1.28s/it]
+Train Ac: 25.174 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                | 65/2976 [01:27<1:01:02,  1.26s/it]
+Train Ac: 32.118 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                | 65/2976 [01:28<1:01:02,  1.26s/it]
+Train Ac: 32.118 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                  | 66/2976 [01:28<58:09,  1.20s/it]
+Train Ac: 42.014 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                  | 66/2976 [01:29<58:09,  1.20s/it]
+Train Ac: 42.014 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                  | 67/2976 [01:29<53:45,  1.11s/it]
+Train Ac: 34.288 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                  | 67/2976 [01:30<53:45,  1.11s/it]
+Train Ac: 34.288 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                  | 68/2976 [01:30<58:05,  1.20s/it]
+Train Ac: 32.465 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|7                                  | 68/2976 [01:31<58:05,  1.20s/it]
+Train Ac: 32.465 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|8                                  | 69/2976 [01:31<54:52,  1.13s/it]
+Train Ac: 25.521 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|8                                  | 69/2976 [01:32<54:52,  1.13s/it]
+Train Ac: 25.521 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|8                                  | 70/2976 [01:32<52:52,  1.09s/it]
+Train Ac: 49.392 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|8                                  | 70/2976 [01:33<52:52,  1.09s/it]
+Train Ac: 49.392 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|8                                  | 71/2976 [01:33<52:08,  1.08s/it]
+Train Ac: 40.278 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|8                                  | 71/2976 [01:34<52:08,  1.08s/it]
+Train Ac: 40.278 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|8                                  | 72/2976 [01:34<52:25,  1.08s/it]
+Train Ac: 3.038 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|8                                   | 72/2976 [01:35<52:25,  1.08s/it]
+Train Ac: 3.038 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|8                                   | 73/2976 [01:35<51:38,  1.07s/it]
+Train Ac: 46.701 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|8                                  | 73/2976 [01:36<51:38,  1.07s/it]
+Train Ac: 46.701 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|8                                  | 74/2976 [01:36<48:35,  1.00s/it]
+Train Ac: 23.611 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   2%|8                                  | 74/2976 [01:37<48:35,  1.00s/it]
+Train Ac: 23.611 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|8                                  | 75/2976 [01:37<47:46,  1.01it/s]
+Train Ac: 9.115 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                   | 75/2976 [01:38<47:46,  1.01it/s]
+Train Ac: 9.115 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                   | 76/2976 [01:38<49:23,  1.02s/it]
+Train Ac: 67.708 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|8                                  | 76/2976 [01:40<49:23,  1.02s/it]
+Train Ac: 67.708 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 77/2976 [01:40<55:25,  1.15s/it]
+Train Ac: 41.580 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 77/2976 [01:41<55:25,  1.15s/it]
+Train Ac: 41.580 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 78/2976 [01:41<54:04,  1.12s/it]
+Train Ac: 18.142 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 78/2976 [01:42<54:04,  1.12s/it]
+Train Ac: 18.142 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 79/2976 [01:42<53:54,  1.12s/it]
+Train Ac: 19.184 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 79/2976 [01:43<53:54,  1.12s/it]
+Train Ac: 19.184 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 80/2976 [01:43<51:42,  1.07s/it]
+Train Ac: 26.389 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 80/2976 [01:44<51:42,  1.07s/it]
+Train Ac: 26.389 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 81/2976 [01:44<50:39,  1.05s/it]
+Train Ac: 51.302 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 81/2976 [01:45<50:39,  1.05s/it]
+Train Ac: 51.302 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 82/2976 [01:45<51:13,  1.06s/it]
+Train Ac: 20.486 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 82/2976 [01:46<51:13,  1.06s/it]
+Train Ac: 20.486 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 83/2976 [01:46<49:14,  1.02s/it]
+Train Ac: 37.240 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 83/2976 [01:47<49:14,  1.02s/it]
+Train Ac: 37.240 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 84/2976 [01:47<49:19,  1.02s/it]
+Train Ac: 11.719 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 84/2976 [01:48<49:19,  1.02s/it]
+Train Ac: 11.719 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 85/2976 [01:48<49:16,  1.02s/it]
+Train Ac: 25.260 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|9                                  | 85/2976 [01:49<49:16,  1.02s/it]
+Train Ac: 25.260 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 86/2976 [01:49<50:56,  1.06s/it]
+Train Ac: 58.507 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 86/2976 [01:50<50:56,  1.06s/it]
+Train Ac: 58.507 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 87/2976 [01:50<50:46,  1.05s/it]
+Train Ac: 44.792 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 87/2976 [01:51<50:46,  1.05s/it]
+Train Ac: 44.792 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 88/2976 [01:51<50:45,  1.05s/it]
+Train Ac: 35.851 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 88/2976 [01:52<50:45,  1.05s/it]
+Train Ac: 35.851 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 89/2976 [01:52<48:53,  1.02s/it]
+Train Ac: 23.698 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 89/2976 [01:53<48:53,  1.02s/it]
+Train Ac: 23.698 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 90/2976 [01:53<50:45,  1.06s/it]
+Train Ac: 19.965 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 90/2976 [01:54<50:45,  1.06s/it]
+Train Ac: 19.965 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 91/2976 [01:54<49:12,  1.02s/it]
+Train Ac: 18.837 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 91/2976 [01:55<49:12,  1.02s/it]
+Train Ac: 18.837 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 92/2976 [01:55<49:55,  1.04s/it]
+Train Ac: 21.962 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 92/2976 [01:56<49:55,  1.04s/it]
+Train Ac: 21.962 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 93/2976 [01:56<49:47,  1.04s/it]
+Train Ac: 26.562 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#                                  | 93/2976 [01:57<49:47,  1.04s/it]
+Train Ac: 26.562 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#1                                 | 94/2976 [01:57<47:44,  1.01it/s]
+Train Ac: 49.392 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#1                                 | 94/2976 [01:58<47:44,  1.01it/s]
+Train Ac: 49.392 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#1                                 | 95/2976 [01:58<47:37,  1.01it/s]
+Train Ac: 47.049 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#1                                 | 95/2976 [01:59<47:37,  1.01it/s]
+Train Ac: 47.049 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#1                                 | 96/2976 [01:59<51:11,  1.07s/it]
+Train Ac: 38.628 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#1                                 | 96/2976 [02:00<51:11,  1.07s/it]
+Train Ac: 38.628 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#1                                 | 97/2976 [02:00<52:59,  1.10s/it]
+Train Ac: 19.792 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#1                                 | 97/2976 [02:01<52:59,  1.10s/it]
+Train Ac: 19.792 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#1                                 | 98/2976 [02:01<51:21,  1.07s/it]
+Train Ac: 8.767 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#1                                  | 98/2976 [02:02<51:21,  1.07s/it]
+Train Ac: 8.767 %  |  Test Ac: 25.269 %, Peak Test Ac.: 25.269 % (at 50 batches)  |:   3%|#1                                  | 99/2976 [02:02<49:37,  1.04s/it]
+  0%|          | 0/8 [00:00<?, ?it/s]
+[A
+ 12%|#2        | 1/8 [00:01<00:10,  1.45s/it]
+[A
+ 25%|##5       | 2/8 [00:02<00:08,  1.45s/it]
+[A
+ 38%|###7      | 3/8 [00:04<00:06,  1.38s/it]
+[A
+ 50%|#####     | 4/8 [00:05<00:05,  1.47s/it]
+[A
+ 62%|######2   | 5/8 [00:07<00:04,  1.52s/it]
+[A
+ 75%|#######5  | 6/8 [00:08<00:02,  1.49s/it]
+[A
+ 88%|########7 | 7/8 [00:10<00:01,  1.56s/it]
+[A
+100%|##########| 8/8 [00:12<00:00,  1.69s/it]
+[A
+100%|##########| 8/8 [00:12<00:00,  1.57s/it]
+Train Ac: 39.931 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   3%|#1                                | 99/2976 [02:17<49:37,  1.04s/it]
+Train Ac: 39.931 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   3%|#                              | 100/2976 [02:17<4:10:50,  5.23s/it]
+Train Ac: 6.771 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   3%|#                               | 100/2976 [02:18<4:10:50,  5.23s/it]
+Train Ac: 6.771 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   3%|#                               | 101/2976 [02:18<3:09:51,  3.96s/it]
+Train Ac: 37.326 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   3%|#                              | 101/2976 [02:19<3:09:51,  3.96s/it]
+Train Ac: 37.326 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   3%|#                              | 102/2976 [02:19<2:26:31,  3.06s/it]
+Train Ac: 27.517 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   3%|#                              | 102/2976 [02:20<2:26:31,  3.06s/it]
+Train Ac: 27.517 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   3%|#                              | 103/2976 [02:20<1:56:55,  2.44s/it]
+Train Ac: 29.427 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   3%|#                              | 103/2976 [02:21<1:56:55,  2.44s/it]
+Train Ac: 29.427 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   3%|#                              | 104/2976 [02:21<1:37:32,  2.04s/it]
+Train Ac: 40.885 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   3%|#                              | 104/2976 [02:22<1:37:32,  2.04s/it]
+Train Ac: 40.885 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#                              | 105/2976 [02:22<1:21:53,  1.71s/it]
+Train Ac: 41.493 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#                              | 105/2976 [02:23<1:21:53,  1.71s/it]
+Train Ac: 41.493 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#1                             | 106/2976 [02:23<1:13:24,  1.53s/it]
+Train Ac: 22.917 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#1                             | 106/2976 [02:25<1:13:24,  1.53s/it]
+Train Ac: 22.917 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#1                             | 107/2976 [02:25<1:06:09,  1.38s/it]
+Train Ac: 23.698 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#1                             | 107/2976 [02:26<1:06:09,  1.38s/it]
+Train Ac: 23.698 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#1                             | 108/2976 [02:26<1:06:35,  1.39s/it]
+Train Ac: 31.684 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#1                             | 108/2976 [02:27<1:06:35,  1.39s/it]
+Train Ac: 31.684 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#2                               | 109/2976 [02:27<58:58,  1.23s/it]
+Train Ac: 13.281 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#2                               | 109/2976 [02:28<58:58,  1.23s/it]
+Train Ac: 13.281 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#1                             | 110/2976 [02:28<1:00:11,  1.26s/it]
+Train Ac: 25.521 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#1                             | 110/2976 [02:29<1:00:11,  1.26s/it]
+Train Ac: 25.521 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#2                               | 111/2976 [02:29<57:30,  1.20s/it]
+Train Ac: 14.062 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#2                               | 111/2976 [02:30<57:30,  1.20s/it]
+Train Ac: 14.062 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#2                               | 112/2976 [02:30<55:10,  1.16s/it]
+Train Ac: 41.319 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#2                               | 112/2976 [02:31<55:10,  1.16s/it]
+Train Ac: 41.319 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#2                               | 113/2976 [02:31<54:57,  1.15s/it]
+Train Ac: 9.288 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#2                                | 113/2976 [02:32<54:57,  1.15s/it]
+Train Ac: 9.288 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                                | 114/2976 [02:32<53:47,  1.13s/it]
+Train Ac: 11.372 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#2                               | 114/2976 [02:33<53:47,  1.13s/it]
+Train Ac: 11.372 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#2                               | 115/2976 [02:33<52:04,  1.09s/it]
+Train Ac: 10.243 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#2                               | 115/2976 [02:34<52:04,  1.09s/it]
+Train Ac: 10.243 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#2                               | 116/2976 [02:34<51:02,  1.07s/it]
+Train Ac: 12.934 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#2                               | 116/2976 [02:36<51:02,  1.07s/it]
+Train Ac: 12.934 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#2                               | 117/2976 [02:36<50:49,  1.07s/it]
+Train Ac: 20.833 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#2                               | 117/2976 [02:36<50:49,  1.07s/it]
+Train Ac: 20.833 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 118/2976 [02:36<48:42,  1.02s/it]
+Train Ac: 23.872 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 118/2976 [02:37<48:42,  1.02s/it]
+Train Ac: 23.872 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 119/2976 [02:37<46:18,  1.03it/s]
+Train Ac: 35.851 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 119/2976 [02:38<46:18,  1.03it/s]
+Train Ac: 35.851 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 120/2976 [02:38<48:10,  1.01s/it]
+Train Ac: 30.816 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 120/2976 [02:39<48:10,  1.01s/it]
+Train Ac: 30.816 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 121/2976 [02:39<48:40,  1.02s/it]
+Train Ac: 15.972 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 121/2976 [02:41<48:40,  1.02s/it]
+Train Ac: 15.972 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 122/2976 [02:41<54:42,  1.15s/it]
+Train Ac: 38.021 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 122/2976 [02:42<54:42,  1.15s/it]
+Train Ac: 38.021 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 123/2976 [02:42<52:22,  1.10s/it]
+Train Ac: 42.014 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 123/2976 [02:43<52:22,  1.10s/it]
+Train Ac: 42.014 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 124/2976 [02:43<51:24,  1.08s/it]
+Train Ac: 44.010 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 124/2976 [02:44<51:24,  1.08s/it]
+Train Ac: 44.010 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 125/2976 [02:44<50:07,  1.05s/it]
+Train Ac: 30.990 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 125/2976 [02:45<50:07,  1.05s/it]
+Train Ac: 30.990 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 126/2976 [02:45<50:17,  1.06s/it]
+Train Ac: 27.691 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#3                               | 126/2976 [02:46<50:17,  1.06s/it]
+Train Ac: 27.691 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#4                               | 127/2976 [02:46<51:25,  1.08s/it]
+Train Ac: 29.427 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#4                               | 127/2976 [02:47<51:25,  1.08s/it]
+Train Ac: 29.427 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#4                               | 128/2976 [02:47<47:33,  1.00s/it]
+Train Ac: 21.615 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#4                               | 128/2976 [02:48<47:33,  1.00s/it]
+Train Ac: 21.615 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#4                               | 129/2976 [02:48<47:18,  1.00it/s]
+Train Ac: 28.906 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#4                               | 129/2976 [02:49<47:18,  1.00it/s]
+Train Ac: 28.906 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#4                               | 130/2976 [02:49<48:28,  1.02s/it]
+Train Ac: 40.972 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#4                               | 130/2976 [02:50<48:28,  1.02s/it]
+Train Ac: 40.972 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#4                               | 131/2976 [02:50<46:05,  1.03it/s]
+Train Ac: 12.847 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#4                               | 131/2976 [02:51<46:05,  1.03it/s]
+Train Ac: 12.847 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#4                               | 132/2976 [02:51<46:05,  1.03it/s]
+Train Ac: 44.358 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#4                               | 132/2976 [02:52<46:05,  1.03it/s]
+Train Ac: 44.358 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#4                               | 133/2976 [02:52<48:31,  1.02s/it]
+Train Ac: 45.052 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   4%|#4                               | 133/2976 [02:53<48:31,  1.02s/it]
+Train Ac: 45.052 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#4                               | 134/2976 [02:53<50:27,  1.07s/it]
+Train Ac: 41.840 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#4                               | 134/2976 [02:54<50:27,  1.07s/it]
+Train Ac: 41.840 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#4                               | 135/2976 [02:54<49:02,  1.04s/it]
+Train Ac: 44.010 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#4                               | 135/2976 [02:55<49:02,  1.04s/it]
+Train Ac: 44.010 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                               | 136/2976 [02:55<52:20,  1.11s/it]
+Train Ac: 15.625 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                               | 136/2976 [02:57<52:20,  1.11s/it]
+Train Ac: 15.625 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                               | 137/2976 [02:57<52:40,  1.11s/it]
+Train Ac: 61.632 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                               | 137/2976 [02:58<52:40,  1.11s/it]
+Train Ac: 61.632 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                               | 138/2976 [02:58<51:16,  1.08s/it]
+Train Ac: 24.479 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                               | 138/2976 [02:59<51:16,  1.08s/it]
+Train Ac: 24.479 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                               | 139/2976 [02:59<52:06,  1.10s/it]
+Train Ac: 29.080 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                               | 139/2976 [03:00<52:06,  1.10s/it]
+Train Ac: 29.080 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                               | 140/2976 [03:00<48:49,  1.03s/it]
+Train Ac: 2.865 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                                | 140/2976 [03:01<48:49,  1.03s/it]
+Train Ac: 2.865 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                                | 141/2976 [03:01<48:48,  1.03s/it]
+Train Ac: 7.465 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                                | 141/2976 [03:02<48:48,  1.03s/it]
+Train Ac: 7.465 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                                | 142/2976 [03:02<48:05,  1.02s/it]
+Train Ac: 38.108 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                               | 142/2976 [03:03<48:05,  1.02s/it]
+Train Ac: 38.108 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                               | 143/2976 [03:03<49:42,  1.05s/it]
+Train Ac: 24.479 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                               | 143/2976 [03:04<49:42,  1.05s/it]
+Train Ac: 24.479 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                               | 144/2976 [03:04<49:10,  1.04s/it]
+Train Ac: 20.139 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                               | 144/2976 [03:05<49:10,  1.04s/it]
+Train Ac: 20.139 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                               | 145/2976 [03:05<46:23,  1.02it/s]
+Train Ac: 10.330 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                               | 145/2976 [03:06<46:23,  1.02it/s]
+Train Ac: 10.330 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                               | 146/2976 [03:06<47:09,  1.00it/s]
+Train Ac: 49.306 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                               | 146/2976 [03:07<47:09,  1.00it/s]
+Train Ac: 49.306 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                               | 147/2976 [03:07<47:17,  1.00s/it]
+Train Ac: 32.465 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                               | 147/2976 [03:08<47:17,  1.00s/it]
+Train Ac: 32.465 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                               | 148/2976 [03:08<47:42,  1.01s/it]
+Train Ac: 47.743 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                               | 148/2976 [03:09<47:42,  1.01s/it]
+Train Ac: 47.743 %  |  Test Ac: 45.043 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                               | 149/2976 [03:09<47:45,  1.01s/it]
+  0%|          | 0/8 [00:00<?, ?it/s]
+[A
+ 12%|#2        | 1/8 [00:01<00:11,  1.63s/it]
+[A
+ 25%|##5       | 2/8 [00:03<00:09,  1.58s/it]
+[A
+ 38%|###7      | 3/8 [00:04<00:08,  1.61s/it]
+[A
+ 50%|#####     | 4/8 [00:06<00:06,  1.57s/it]
+[A
+ 62%|######2   | 5/8 [00:07<00:04,  1.62s/it]
+[A
+ 75%|#######5  | 6/8 [00:09<00:03,  1.55s/it]
+[A
+ 88%|########7 | 7/8 [00:11<00:01,  1.61s/it]
+[A
+100%|##########| 8/8 [00:12<00:00,  1.60s/it]
+[A
+100%|##########| 8/8 [00:12<00:00,  1.58s/it]
+Train Ac: 32.292 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                               | 149/2976 [03:24<47:45,  1.01s/it]
+Train Ac: 32.292 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                             | 150/2976 [03:24<4:04:13,  5.19s/it]
+Train Ac: 37.066 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                             | 150/2976 [03:25<4:04:13,  5.19s/it]
+Train Ac: 37.066 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                             | 151/2976 [03:25<3:10:58,  4.06s/it]
+Train Ac: 47.222 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                             | 151/2976 [03:26<3:10:58,  4.06s/it]
+Train Ac: 47.222 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                             | 152/2976 [03:26<2:29:59,  3.19s/it]
+Train Ac: 40.451 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                             | 152/2976 [03:27<2:29:59,  3.19s/it]
+Train Ac: 40.451 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                             | 153/2976 [03:27<2:02:06,  2.60s/it]
+Train Ac: 27.691 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#5                             | 153/2976 [03:28<2:02:06,  2.60s/it]
+Train Ac: 27.691 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                             | 154/2976 [03:28<1:37:48,  2.08s/it]
+Train Ac: 48.264 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                             | 154/2976 [03:29<1:37:48,  2.08s/it]
+Train Ac: 48.264 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                             | 155/2976 [03:29<1:22:06,  1.75s/it]
+Train Ac: 29.427 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                             | 155/2976 [03:31<1:22:06,  1.75s/it]
+Train Ac: 29.427 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                             | 156/2976 [03:31<1:15:42,  1.61s/it]
+Train Ac: 14.323 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                             | 156/2976 [03:31<1:15:42,  1.61s/it]
+Train Ac: 14.323 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                             | 157/2976 [03:31<1:05:29,  1.39s/it]
+Train Ac: 15.972 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                             | 157/2976 [03:32<1:05:29,  1.39s/it]
+Train Ac: 15.972 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                             | 158/2976 [03:32<1:00:03,  1.28s/it]
+Train Ac: 32.899 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#6                             | 158/2976 [03:33<1:00:03,  1.28s/it]
+Train Ac: 32.899 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#7                               | 159/2976 [03:33<56:27,  1.20s/it]
+Train Ac: 44.965 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#7                               | 159/2976 [03:35<56:27,  1.20s/it]
+Train Ac: 44.965 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#7                               | 160/2976 [03:35<54:50,  1.17s/it]
+Train Ac: 19.358 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#7                               | 160/2976 [03:35<54:50,  1.17s/it]
+Train Ac: 19.358 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#7                               | 161/2976 [03:35<49:45,  1.06s/it]
+Train Ac: 31.163 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#7                               | 161/2976 [03:37<49:45,  1.06s/it]
+Train Ac: 31.163 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#7                               | 162/2976 [03:37<51:36,  1.10s/it]
+Train Ac: 39.236 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#7                               | 162/2976 [03:38<51:36,  1.10s/it]
+Train Ac: 39.236 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#8                               | 163/2976 [03:38<50:13,  1.07s/it]
+Train Ac: 47.656 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   5%|#8                               | 163/2976 [03:38<50:13,  1.07s/it]
+Train Ac: 47.656 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#8                               | 164/2976 [03:38<48:32,  1.04s/it]
+Train Ac: 45.399 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#8                               | 164/2976 [03:39<48:32,  1.04s/it]
+Train Ac: 45.399 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#8                               | 165/2976 [03:39<46:24,  1.01it/s]
+Train Ac: 31.424 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#8                               | 165/2976 [03:40<46:24,  1.01it/s]
+Train Ac: 31.424 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#8                               | 166/2976 [03:40<46:28,  1.01it/s]
+Train Ac: 20.486 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#8                               | 166/2976 [03:41<46:28,  1.01it/s]
+Train Ac: 20.486 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#8                               | 167/2976 [03:41<47:09,  1.01s/it]
+Train Ac: 26.910 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#8                               | 167/2976 [03:43<47:09,  1.01s/it]
+Train Ac: 26.910 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#8                               | 168/2976 [03:43<51:01,  1.09s/it]
+Train Ac: 46.441 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#8                               | 168/2976 [03:44<51:01,  1.09s/it]
+Train Ac: 46.441 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#8                               | 169/2976 [03:44<51:18,  1.10s/it]
+Train Ac: 47.222 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#8                               | 169/2976 [03:45<51:18,  1.10s/it]
+Train Ac: 47.222 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#8                               | 170/2976 [03:45<49:12,  1.05s/it]
+Train Ac: 9.288 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                                | 170/2976 [03:46<49:12,  1.05s/it]
+Train Ac: 9.288 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                                | 171/2976 [03:46<46:22,  1.01it/s]
+Train Ac: 30.990 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#8                               | 171/2976 [03:47<46:22,  1.01it/s]
+Train Ac: 30.990 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 172/2976 [03:47<45:13,  1.03it/s]
+Train Ac: 1.215 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                                | 172/2976 [03:48<45:13,  1.03it/s]
+Train Ac: 1.215 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                                | 173/2976 [03:48<45:37,  1.02it/s]
+Train Ac: 28.646 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 173/2976 [03:49<45:37,  1.02it/s]
+Train Ac: 28.646 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 174/2976 [03:49<46:02,  1.01it/s]
+Train Ac: 51.736 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 174/2976 [03:49<46:02,  1.01it/s]
+Train Ac: 51.736 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 175/2976 [03:49<44:05,  1.06it/s]
+Train Ac: 10.069 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 175/2976 [03:50<44:05,  1.06it/s]
+Train Ac: 10.069 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 176/2976 [03:50<43:11,  1.08it/s]
+Train Ac: 33.594 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 176/2976 [03:52<43:11,  1.08it/s]
+Train Ac: 33.594 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 177/2976 [03:52<48:01,  1.03s/it]
+Train Ac: 68.056 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 177/2976 [03:53<48:01,  1.03s/it]
+Train Ac: 68.056 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 178/2976 [03:53<47:39,  1.02s/it]
+Train Ac: 54.340 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 178/2976 [03:53<47:39,  1.02s/it]
+Train Ac: 54.340 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 179/2976 [03:53<45:58,  1.01it/s]
+Train Ac: 66.319 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 179/2976 [03:55<45:58,  1.01it/s]
+Train Ac: 66.319 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 180/2976 [03:55<48:29,  1.04s/it]
+Train Ac: 35.938 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|#9                               | 180/2976 [03:56<48:29,  1.04s/it]
+Train Ac: 35.938 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 181/2976 [03:56<51:10,  1.10s/it]
+Train Ac: 27.691 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 181/2976 [03:57<51:10,  1.10s/it]
+Train Ac: 27.691 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 182/2976 [03:57<49:09,  1.06s/it]
+Train Ac: 46.788 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 182/2976 [03:58<49:09,  1.06s/it]
+Train Ac: 46.788 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 183/2976 [03:58<48:15,  1.04s/it]
+Train Ac: 36.111 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 183/2976 [03:59<48:15,  1.04s/it]
+Train Ac: 36.111 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 184/2976 [03:59<47:57,  1.03s/it]
+Train Ac: 71.441 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 184/2976 [04:00<47:57,  1.03s/it]
+Train Ac: 71.441 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 185/2976 [04:00<49:11,  1.06s/it]
+Train Ac: 49.653 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 185/2976 [04:01<49:11,  1.06s/it]
+Train Ac: 49.653 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 186/2976 [04:01<48:02,  1.03s/it]
+Train Ac: 15.799 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 186/2976 [04:02<48:02,  1.03s/it]
+Train Ac: 15.799 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 187/2976 [04:02<48:02,  1.03s/it]
+Train Ac: 69.097 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 187/2976 [04:03<48:02,  1.03s/it]
+Train Ac: 69.097 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 188/2976 [04:03<47:46,  1.03s/it]
+Train Ac: 21.181 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 188/2976 [04:04<47:46,  1.03s/it]
+Train Ac: 21.181 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 189/2976 [04:04<49:24,  1.06s/it]
+Train Ac: 48.351 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##                               | 189/2976 [04:05<49:24,  1.06s/it]
+Train Ac: 48.351 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##1                              | 190/2976 [04:05<50:21,  1.08s/it]
+Train Ac: 33.854 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##1                              | 190/2976 [04:06<50:21,  1.08s/it]
+Train Ac: 33.854 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##1                              | 191/2976 [04:06<50:22,  1.09s/it]
+Train Ac: 25.087 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##1                              | 191/2976 [04:07<50:22,  1.09s/it]
+Train Ac: 25.087 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##1                              | 192/2976 [04:07<50:00,  1.08s/it]
+Train Ac: 36.024 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##1                              | 192/2976 [04:09<50:00,  1.08s/it]
+Train Ac: 36.024 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##1                              | 193/2976 [04:09<51:04,  1.10s/it]
+Train Ac: 64.844 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   6%|##1                              | 193/2976 [04:10<51:04,  1.10s/it]
+Train Ac: 64.844 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   7%|##1                              | 194/2976 [04:10<50:42,  1.09s/it]
+Train Ac: 30.729 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   7%|##1                              | 194/2976 [04:11<50:42,  1.09s/it]
+Train Ac: 30.729 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   7%|##1                              | 195/2976 [04:11<52:11,  1.13s/it]
+Train Ac: 55.208 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   7%|##1                              | 195/2976 [04:12<52:11,  1.13s/it]
+Train Ac: 55.208 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   7%|##1                              | 196/2976 [04:12<49:41,  1.07s/it]
+Train Ac: 48.698 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   7%|##1                              | 196/2976 [04:13<49:41,  1.07s/it]
+Train Ac: 48.698 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   7%|##1                              | 197/2976 [04:13<46:57,  1.01s/it]
+Train Ac: 32.899 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   7%|##1                              | 197/2976 [04:14<46:57,  1.01s/it]
+Train Ac: 32.899 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   7%|##1                              | 198/2976 [04:14<48:57,  1.06s/it]
+Train Ac: 52.778 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   7%|##1                              | 198/2976 [04:16<48:57,  1.06s/it]
+Train Ac: 52.778 %  |  Test Ac: 42.400 %, Peak Test Ac.: 45.043 % (at 100 batches)  |:   7%|##                             | 199/2976 [04:16<1:07:53,  1.47s/it]
+  0%|          | 0/8 [00:00<?, ?it/s]
+[A
+ 12%|#2        | 1/8 [00:01<00:13,  1.86s/it]
+[A
+ 25%|##5       | 2/8 [00:03<00:11,  1.84s/it]
+[A
+ 38%|###7      | 3/8 [00:05<00:09,  1.91s/it]
+[A
+ 50%|#####     | 4/8 [00:07<00:07,  1.86s/it]
+[A
+ 62%|######2   | 5/8 [00:09<00:05,  1.91s/it]
+[A
+ 75%|#######5  | 6/8 [00:11<00:03,  1.89s/it]
+[A
+ 88%|########7 | 7/8 [00:13<00:01,  1.83s/it]
+[A
+100%|##########| 8/8 [00:15<00:00,  2.02s/it]
+[A
+100%|##########| 8/8 [00:15<00:00,  1.94s/it]
+Train Ac: 52.865 %  |  Test Ac: 53.283 %, Peak Test Ac.: 53.283 % (at 200 batches)  |:   7%|##                             | 199/2976 [04:34<1:07:53,  1.47s/it]
+Train Ac: 52.865 %  |  Test Ac: 53.283 %, Peak Test Ac.: 53.283 % (at 200 batches)  |:   7%|##                             | 200/2976 [04:34<4:57:37,  6.43s/it]
+Train Ac: 46.181 %  |  Test Ac: 53.283 %, Peak Test Ac.: 53.283 % (at 200 batches)  |:   7%|##                             | 200/2976 [04:35<4:57:37,  6.43s/it]
+Train Ac: 46.181 %  |  Test Ac: 53.283 %, Peak Test Ac.: 53.283 % (at 200 batches)  |:   7%|##                             | 201/2976 [04:35<3:41:28,  4.79s/it]
+Train Ac: 32.031 %  |  Test Ac: 53.283 %, Peak Test Ac.: 53.283 % (at 200 batches)  |:   7%|##                             | 201/2976 [04:36<3:41:28,  4.79s/it]
+Train Ac: 32.031 %  |  Test Ac: 53.283 %, Peak Test Ac.: 53.283 % (at 200 batches)  |:   7%|##1                            | 202/2976 [04:36<2:48:44,  3.65s/it]
+Train Ac: 32.031 %  |  Test Ac: 53.283 %, Peak Test Ac.: 53.283 % (at 200 batches)  |:   7%|##1                            | 202/2976 [04:37<2:48:44,  3.65s/it]
+Train Ac: 32.031 %  |  Test Ac: 53.283 %, Peak Test Ac.: 53.283 % (at 200 batches)  |:   7%|##1                            | 203/2976 [04:37<2:11:39,  2.85s/it]
+Train Ac: 49.132 %  |  Test Ac: 53.283 %, Peak Test Ac.: 53.283 % (at 200 batches)  |:   7%|##1                            | 203/2976 [04:38<2:11:39,  2.85s/it]
+Train Ac: 49.132 %  |  Test Ac: 53.283 %, Peak Test Ac.: 53.283 % (at 200 batches)  |:   7%|##1                            | 204/2976 [04:38<1:48:08,  2.34s/it]
+Train Ac: 67.795 %  |  Test Ac: 53.283 %, Peak Test Ac.: 53.283 % (at 200 batches)  |:   7%|##1                            | 204/2976 [04:39<1:48:08,  2.34s/it]
+Train Ac: 67.795 %  |  Test Ac: 53.283 %, Peak Test Ac.: 53.283 % (at 200 batches)  |:   7%|##1                            | 205/2976 [04:39<1:28:01,  1.91s/it]
+wandb: Ctrl-c pressed. Waiting for runs to end. Press ctrl-c again to terminate them.
+  0% 0/1 [05:03<?, ?trial/s, best loss=?]
+ODE-RNN  True
+Classic-RNN:  False
+Stacked layers:  1
+Stacked layers:  ['ode_rnn']
+ODE-type:  linear
+RNN-cell:  gru
+Weight-sharing ODE:  False
+Weight-sharing RNN:  False
+Using BN:  True
+defaut adapted LR's!!
+Used Optimizer: adam
+Used Ode-Solver euler
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+TRIAL PROTOCOL:
+---------------------------------------------------------------------------------------------------------------------------------------------
+wandb: Ctrl-c pressed.
+wandb: Program failed with code 255. Press ctrl-c to abort syncing.
+Traceback (most recent call last):
+  File "run_models.py", line 250, in <module>
+    max_evals=args.num_search)
+  File "/cluster/home/metzgern/.local/lib/python3.7/site-packages/hyperopt/fmin.py", line 482, in fmin
+    show_progressbar=show_progressbar,
+  File "/cluster/home/metzgern/.local/lib/python3.7/site-packages/hyperopt/base.py", line 686, in fmin
+    show_progressbar=show_progressbar,
+  File "/cluster/home/metzgern/.local/lib/python3.7/site-packages/hyperopt/fmin.py", line 509, in fmin
+    rval.exhaust()
+  File "/cluster/home/metzgern/.local/lib/python3.7/site-packages/hyperopt/fmin.py", line 330, in exhaust
+    self.run(self.max_evals - n_done, block_until_done=self.asynchronous)
+  File "/cluster/home/metzgern/.local/lib/python3.7/site-packages/hyperopt/fmin.py", line 286, in run
+    self.serial_evaluate()
+  File "/cluster/home/metzgern/.local/lib/python3.7/site-packages/hyperopt/fmin.py", line 165, in serial_evaluate
+    result = self.domain.evaluate(spec, ctrl)
+  File "/cluster/home/metzgern/.local/lib/python3.7/site-packages/hyperopt/base.py", line 894, in evaluate
+    rval = self.fn(pyll_rval)
+  File "/cluster/work/igp_psr/metzgern/CONVODEcrop/latent_ode-my_mod_hparam/lib/training.py", line 188, in construct_and_train_model
+    [Devices[0]]
+  File "/cluster/work/igp_psr/metzgern/CONVODEcrop/latent_ode-my_mod_hparam/lib/training.py", line 315, in train_it
+    train_res[i] = Model[i].compute_all_losses(batch_dict[i], n_traj_samples = 3, kl_coef = kl_coef)
+  File "/cluster/work/igp_psr/metzgern/CONVODEcrop/latent_ode-my_mod_hparam/lib/base_models.py", line 144, in compute_all_losses
+    mode = batch_dict["mode"], testing=testing)
+  File "/cluster/work/igp_psr/metzgern/CONVODEcrop/latent_ode-my_mod_hparam/lib/ode_rnn.py", line 444, in get_reconstruction
+    input_sequence, truth_time_steps, run_backwards = False, testing=testing)
+  File "/cluster/work/igp_psr/metzgern/CONVODEcrop/latent_ode-my_mod_hparam/lib/encoder_decoder.py", line 399, in run_odernn
+    yi_ode, prev_std = self.RNN_update(yi_ode, prev_std, xi)
+  File "/cluster/home/metzgern/.local/lib/python3.7/site-packages/torch/nn/modules/module.py", line 532, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/cluster/work/igp_psr/metzgern/CONVODEcrop/latent_ode-my_mod_hparam/lib/CONVRNNcells.py", line 189, in forward
+    new_state, new_state_std = utils.split_last_dim(self.new_state_net(concat))
+  File "/cluster/home/metzgern/.local/lib/python3.7/site-packages/torch/nn/modules/module.py", line 532, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/cluster/home/metzgern/.local/lib/python3.7/site-packages/torch/nn/modules/container.py", line 100, in forward
+    input = module(input)
+  File "/cluster/home/metzgern/.local/lib/python3.7/site-packages/torch/nn/modules/module.py", line 532, in __call__
+    result = self.forward(*input, **kwargs)
+  File "/cluster/home/metzgern/.local/lib/python3.7/site-packages/torch/nn/modules/activation.py", line 295, in forward
+    return torch.tanh(input)
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "run_models.py", line 276, in <module>
+    hyperopt_summary(trials)
+  File "/cluster/work/igp_psr/metzgern/CONVODEcrop/latent_ode-my_mod_hparam/lib/utils.py", line 973, in hyperopt_summary
+    trial["result"]["num_seeds"],
+KeyError: 'num_seeds'
+
+wandb: Waiting for W&B process to finish, PID 4082
+wandb: Run summary:
+wandb:                                                          global_step 400
+wandb:                                                           _timestamp 1606134616.0185328
+wandb:                                                             _runtime 308.760390996933
+wandb:                                                                _step 400
+wandb:                                   Other_metrics/validation_precision 0.1883113545673338
+wandb:                                                           loss/train 1.6780500411987305
+wandb:                                            Other_metrics/train_kappa 0.15899860042834146
+wandb:                         Classification_accuracy/validation_peak_step 400
+wandb:                                          Other_metrics/validation_f1 0.12179697502964122
+wandb:                                                      loss/validation 1.5827640295028687
+wandb:                                           Other_metrics/train_recall 0.15587386315579346
+wandb:                                               Other_metrics/train_f1 0.18041198494756439
+wandb:                                      Other_metrics/validation_recall 0.1537839697738221
+wandb:                                        Classification_accuracy/train 0.5286458333333334
+wandb:                              Classification_accuracy/validation_peak 0.5328342013888889
+wandb:                                       Other_metrics/validation_kappa 0.3367347291175209
+wandb:                                        Other_metrics/train_precision 0.30913180386864597
+wandb:                                   Classification_accuracy/validation 0.5328342013888889
+wandb: Syncing 6 W&B file(s), 5 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: - 0.56MB of 0.56MB uploaded (0.00MB deduped)wandb:                                                                                
+wandb: Synced leafy-sweep-3: https://app.wandb.ai/cropteam/odecropclassification/runs/9lho6umv
+wandb: Terminating and syncing runs. Press ctrl-c to kill.

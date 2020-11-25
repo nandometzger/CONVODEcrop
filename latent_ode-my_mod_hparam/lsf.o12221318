@@ -1,0 +1,5 @@
+wandb: Starting wandb agent 🕵️
+2020-11-23 16:40:42,086 - wandb.wandb_agent - INFO - Running runs: []
+2020-11-23 16:40:42,426 - wandb.wandb_agent - INFO - Agent received command: exit
+2020-11-23 16:40:42,449 - wandb.wandb_agent - INFO - Received exit command. Killing runs and quitting.
+wandb: Terminating and syncing runs. Press ctrl-c to kill.
