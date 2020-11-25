@@ -24,7 +24,7 @@ import torch
 import torch.nn as nn
 from torch.nn.functional import relu
 import torch.optim as optim
-from torch.utils.tensorboard import SummaryWriter
+#from torch.utils.tensorboard import SummaryWriter
 
 import lib.utils as utils
 from lib.plotting import *
@@ -62,10 +62,10 @@ parser.add_argument('--load', type=str, default=None, help="NOT IN USE! ID of th
 parser.add_argument('-r', '--random-seed', type=int, default=1991, help="Random_seed")
 
 parser.add_argument('--dataset', type=str, default='crop', help="Dataset to load. Available: crop, swisscrop, swissmaps")
+parser.add_argument('--"swissmaps_test"', type=bool, default=False, help="As default, it will take the same data type also for testing. For swisscrop, one has the option to evaluate on the swissmap in order to produce maps.")
 parser.add_argument('-s', '--sample-tp', type=float, default=None, help="NOT IN USE! Number of time points to sub-sample."
 	"If > 1, subsample exact number of points. If the number is in [0,1], take a percentage of available points per time series. If None, do not subsample")
 
-#only for swissdata:
 parser.add_argument('--step', type=int, default=1, help="intervall used for skipping observations in swissdata")
 parser.add_argument('--trunc', type=int, default=9, help="Feature truncation in swissdata")
 parser.add_argument('--swissdatatype', type=str, default="2", help="blank (default), 2 (for more selective cloud handling), 2_toplabels for the most frequent labels. (only works if accordingly preprocessed) ")
