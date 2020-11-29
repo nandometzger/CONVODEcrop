@@ -131,9 +131,10 @@ def compute_multiclass_CE_loss(label_predictions, true_label, mask, convolutiona
 
 	if convolutional:
 		label_predictions = label_predictions.permute(0,2,3,1).reshape(n_traj_samples * n_traj * n_tp * h * w, n_dims)
+		true_label = true_label.permute(0,2,3,1).reshape(n_traj_samples * n_traj * n_tp * h * w, n_dims)
 	else:
 		label_predictions = label_predictions.reshape(n_traj_samples * n_traj * n_tp * h * w, n_dims)
-	true_label = true_label.reshape(n_traj_samples * n_traj * n_tp * h * w, n_dims)
+		true_label = true_label.reshape(n_traj_samples * n_traj * n_tp * h * w, n_dims)
 
 	# choose time points with at least one measurement
 	mask = torch.sum(mask, 2) > 0
