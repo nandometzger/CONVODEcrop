@@ -67,12 +67,11 @@ def parse_datasets(args, device):
 			root = scratch_root2
 		print("dataroot: " + root)
 
-		train_dataset_obj = Crops(root, mode="train", args=args, noskip=False,
+		train_dataset_obj = Crops(root, mode="train", args=args, noskip=args.noskip,
 									download=True, device = device, list_form = list_form)
-		test_dataset_obj = Crops(root, mode="test", args=args, noskip=False,
-									download=True, device = device, list_form = list_form)
-		
-		eval_dataset_obj = Crops(root, mode="eval", args=args, noskip=False, 
+		test_dataset_obj = Crops(root, mode="test", args=args, noskip=args.noskip,
+									download=True, device = device, list_form = list_form)	
+		eval_dataset_obj = Crops(root, mode="eval", args=args, noskip=args.noskip, 
 									download=True, device = device,  list_form = list_form)
 		
 		n_samples = min(args.n, len(train_dataset_obj))
@@ -193,15 +192,43 @@ def parse_datasets(args, device):
 		train_dataset_obj = SwissCrops(root, mode="train", device=device,  noskip=args.noskip,
 										step=args.step, trunc=args.trunc, nsamples=args.n,
 										datatype=args.swissdatatype, singlepix=args.singlepix)
-		test_dataset_obj = SwissCrops(root, mode="test", device=device,  noskip=args.noskip,
-										step=args.step, trunc=args.trunc, nsamples=args.validn,
-										datatype=args.swissdatatype, singlepix=args.singlepix) 
 		
+		map_test = True
+		if map_test:
+			# using the swissmap dataset for testing/evaluation
+			# Search for a dataroot
+			rawroot = r'data/SwissCrops/raw'
+			scratch_root1 = r'/cluster/scratch/metzgern/ODEcrop/Swisscrop/raw'
+			scratch_root2 = r'/scratch/Nando/ODEcrop/Swisscrop/raw'
+			server_root1 = r'/home/pf/pfstud/metzgern_PF/ODE_Nando/ODE_crop_Project/latent_ode-my_mod_hparam/data/SwissCrops/raw'
+			if os.path.exists(scratch_root1):
+				rawroot = scratch_root1
+				print(scratch_root1)
+			elif os.path.exists(scratch_root2):
+				rawroot = scratch_root2
+				print(scratch_root2)
+			elif os.path.exists(server_root1):
+				rawroot = server_root1
+				print(server_root1)
+			else:
+				print(rawroot, " not found")
+			data_path = rawroot + "/train_set_24x24_debug.hdf5"
+			print("dataroot for testing: " + root)
+			print("data_path for testing: " + data_path)
+			
+			t = 0.0 #attention, this t value is 0, because for training it is also 0. later: masked predction with t=0.9 will be performed! but for comparability with the other methods
+			test_dataset_obj = Dataset(data_path, t, 'test', args=args, prepare_output=True, label_type='13', device = device,
+									subsamp=args.testsub, step=args.step, part_update=args.part_update, noskip=args.noskip, untile=True)
+		else:
+			test_dataset_obj = SwissCrops(root, mode="test", device=device,  noskip=args.noskip,
+											step=args.step, trunc=args.trunc, nsamples=args.validn,
+											datatype=args.swissdatatype, singlepix=args.singlepix) 
+			
 		n_samples = min(args.n, len(train_dataset_obj))
 		n_test_samples = min( float("inf"), len(test_dataset_obj))
 		
 		#evaluation batch sizes. #Must be tuned to increase efficency of evaluation
-		validation_batch_size = 5000 # size 30000 is 10s per batch, also depending on server connection
+		validation_batch_size = 5000 if not map_test else 10 # size 30000 is 10s per batch, also depending on server connection
 		train_batch_size = min(args.batch_size, args.n)
 		test_batch_size = min(n_test_samples, validation_batch_size)
 
@@ -212,7 +239,11 @@ def parse_datasets(args, device):
 		labels = a_train_dict["labels"]
 		
 		train_dataloader = FastTensorDataLoader(train_dataset_obj, batch_size=train_batch_size, subsamp=args.trainsub)
-		test_dataloader = FastTensorDataLoader(test_dataset_obj, batch_size=test_batch_size, subsamp=args.testsub)
+		if map_test:
+			test_dataloader = torch.utils.data.DataLoader(test_dataset_obj,batch_size=test_batch_size, shuffle=True,
+														num_workers=0, worker_init_fn=np.random.seed(1996))
+		else:
+			test_dataloader = FastTensorDataLoader(test_dataset_obj, batch_size=test_batch_size, subsamp=args.testsub)
 
 		data_objects = {"dataset_obj": train_dataset_obj, 
 					"train_dataloader": utils.inf_generator(train_dataloader), 
@@ -230,7 +261,6 @@ def parse_datasets(args, device):
 	
 	if dataset_name == "swissmaps":
 		
-		# Search for a dataroot
 		# Search for a dataroot
 		root = r'data/SwissCrops/raw'
 		scratch_root1 = r'/cluster/scratch/metzgern/ODEcrop/Swisscrop/raw'
@@ -251,10 +281,12 @@ def parse_datasets(args, device):
 		print("dataroot: " + root)
 
 		torch.multiprocessing.set_start_method('spawn', force=True)
-
-		train_dataset_obj = Dataset(data_path, 0.9, 'train', args=args, prepare_output=True, label_type='13', device = device,
+		
+		#treshhold for inclusion and exclusion of patches 
+		t = 0.9
+		train_dataset_obj = Dataset(data_path, t, 'train', args=args, prepare_output=True, label_type='13', device = device,
 									subsamp=args.trainsub, step=args.step, part_update=args.part_update, noskip=args.noskip)
-		test_dataset_obj = Dataset(data_path, 0.9, 'test', args=args, prepare_output=True, label_type='13', device = device,
+		test_dataset_obj = Dataset(data_path, t, 'test', args=args, prepare_output=True, label_type='13', device = device,
 									subsamp=args.testsub, step=args.step, part_update=args.part_update, noskip=args.noskip)
 
 		#n_samples = min(args.n, len(train_dataset_obj))

@@ -22,6 +22,7 @@ from lib.utils import FastTensorDataLoader
 
 import pdb
 
+
 class SwissCrops(object):
 
 	# Complete list
@@ -911,7 +912,6 @@ class Dataset(torch.utils.data.Dataset):
 		
 	def __len__(self):
 		if self.mode=="train":
-			#return self.valid_samples # TODO: remove this line!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			return min(self.args.n, self.valid_samples) 
 		if self.mode=="test":
 			return min(self.args.validn, self.valid_samples)
@@ -937,7 +937,7 @@ class Dataset(torch.utils.data.Dataset):
 
 	def __getitem__(self, idx):
 					 
-		idx = self.valid_list[idx]
+		idx = self.valid_list[idx] #changes to the correct location for the index
 		X = self.data["data"][idx]
 		target_ = self.data["gt"][idx,...,0]
 		cloud_cover = self.data["cloud_cover"][idx,...]
@@ -1022,7 +1022,6 @@ class Dataset(torch.utils.data.Dataset):
 		#keep values between 0-1
 		X = X * 1e-4
 		
-		# !!!!DEBUG_CHECKPOINT!!!!
 		if not self.untile:
 			if self.prepare_output:
 				# prepare to feed it to conv-rnns
@@ -1031,13 +1030,12 @@ class Dataset(torch.utils.data.Dataset):
 				time_stamps = torch.from_numpy( self.timestamps )#.to(self.dataset.device)
 				cloud_cover = torch.from_numpy(cloud_cover ).float()#.to(self.dataset.device)
 				labels = torch.from_numpy( target ).float()#.to(self.dataset.device)
-				
+
 				# TODO: normalization!
 				if self.normalize:
 					xshape = data_full.shape
 					data_full == (data_full-torch.tensor(self.means).unsqueeze(0).unsqueeze(2).unsqueeze(3).repeat(xshape[0],1,xshape[2],xshape[3]))/torch.tensor(self.stds).unsqueeze(0).unsqueeze(2).unsqueeze(3).repeat(xshape[0],1,xshape[2],xshape[3])
 
-				
 				# truncate bad weather
 				cloud_mask = (cloud_cover>self.cloud_thresh).type(torch.float32)
 				cloud_mask = cloud_mask.unsqueeze(1).repeat(1,self.feature_trunc,1,1)
@@ -1166,6 +1164,11 @@ class Dataset(torch.utils.data.Dataset):
 			cloud_mask = cloud_cover>self.cloud_thresh
 			invalid_obs = np.sum(cloud_mask,axis=0)==0
 
+			#create coordinate shape
+			patch_shape = X.shape[2:]
+			coords = np.arange(np.prod(patch_shape)).reshape(patch_shape)
+
+			#subtile inv_obs_mask
 			sub_shape = (self.nb, self.nb)
 			view_shape = tuple(np.subtract(invalid_obs.shape, sub_shape) + 1) + sub_shape
 			strides = invalid_obs.strides + invalid_obs.strides
@@ -1197,6 +1200,15 @@ class Dataset(torch.utils.data.Dataset):
 
 			ravel_X = sub_X.reshape(raw_batch, sub_X.shape[4], nfeatures )
 
+			# subtile Coordinates
+			sub_shape = (self.nb, self.nb)
+			view_shape = tuple(np.subtract(coords.shape, sub_shape) + 1) + sub_shape
+			strides = coords.strides + coords.strides
+
+			sub_coords = np.lib.stride_tricks.as_strided(coords,view_shape,strides)
+			ravel_coords = sub_coords[:,:,self.nb//2, self.nb//2].reshape(-1)
+			final_coords = np.vstack([ravel_coords, idx.repeat(ravel_coords.shape)])
+
 			# subtile Targets
 			sub_shape = (self.nb, self.nb)
 			view_shape = tuple(np.subtract(target.shape, sub_shape) + 1) + sub_shape
@@ -1211,13 +1223,13 @@ class Dataset(torch.utils.data.Dataset):
 			ravel_target_local_1 = sub_target_local_1[:,:,self.nb//2, self.nb//2].reshape(-1)
 			ravel_target_local_2 = sub_target_local_2[:,:,self.nb//2, self.nb//2].reshape(-1)[:]
 			
-			#subtile gt_instances
-			#TODO: ... ??? Check how this exactly works!!
+			#subtile gt_instances, not used later!!!
 			sub_shape = (self.nb, self.nb)
 			view_shape = tuple(np.subtract(target.shape, sub_shape) + 1) + sub_shape
 			strides = gt_instance.strides + gt_instance.strides
 			sub_gt_instance = np.lib.stride_tricks.as_strided(gt_instance,view_shape,strides)
 
+			"""
 			# bring to one-hot format
 			OH_target = np.zeros((ravel_target.size, ntargetclasses))
 			OH_target[np.arange(ravel_target.size),ravel_target] = 1
@@ -1227,15 +1239,68 @@ class Dataset(torch.utils.data.Dataset):
 
 			OH_target_local_2 = np.zeros((ravel_target_local_2.size, ntargetclasses_l2))
 			OH_target_local_2[np.arange(ravel_target_local_2.size),ravel_target_local_2] = 1
+			"""
 
 			# if only one pixel in a neighbourhood is corrupted, we don't use it=> set complete mask of this (sample, timestep) as unobserved
 			# may be changed in later exermiments
 			mask = np.tile( (mask.sum(2)==nfeatures)[:,:,np.newaxis] , (1,1,nfeatures))
-
+			
 			# "destroy" data, that is corrputed by bad weather. We will never use it!
 			ravel_X[~mask] = 0
 
-			return ravel_X, OH_target, OH_target_local_1, OH_target_local_2, mask, sub_gt_instance
+			data_full = torch.from_numpy( ravel_X ).float()#.to(self.dataset.device)
+			time_stamps = torch.from_numpy( self.timestamps )#.to(self.dataset.device)
+			mask = torch.from_numpy( mask ).float()#.to(self.dataset.device)
+			labels = torch.from_numpy( ravel_target ).float()#.to(self.dataset.device)
+
+			data_dict = {
+					"data": data_full.to(self.device), 
+					"time_steps": time_stamps.to(self.device),
+					"mask": mask.to(self.device),
+					"labels": labels}
+					
+			#perform remapping for Swisscrops
+			remap=True #no not change, remapping is needed for swissdata!!
+			if remap:
+				targetind = data_dict["labels"]
+
+				for i in range(len(self.labellistglob)):
+					#delete the label if it is not within the k most frequent classes k={13,23}
+					if not (self.labellist[i] in self.labellist13):
+						targetind[targetind == self.labellistglob[i]] = 0
+				
+				# Reduce range of labels
+				uniquelabels = np.unique(self.labellistglob13)
+				for i in range(self.nclasses()):
+					targetind[targetind == uniquelabels[i]] = i+1
+
+				#Convert back to one hot
+				labels = torch.nn.functional.one_hot(targetind.long(),self.nclasses()+1)
+				#labels = torch.zeros((h, w, self.nclasses()))
+				#labels[np.arange(h), np.arange(w), targetind] = 1
+				data_dict["labels"] = labels.to(self.device)
+			else:
+				data_dict["labels"] = data_dict["labels"].to(self.device)
+
+			data_dict = utils.split_and_subsample_batch(data_dict, self.args, data_type = self.mode)
+					
+			observed_data = data_dict["observed_data"]
+			observed_tp =  data_dict["observed_tp"]
+			data_to_predict = data_dict["data_to_predict"]
+			tp_to_predict = data_dict["tp_to_predict"]
+			observed_mask = data_dict["observed_mask"]
+			mask_predicted_data = data_dict["mask_predicted_data"]
+			labels = data_dict["labels"]
+			mode = data_dict["mode"]
+			
+			if not self.eval_mode:  
+				return  observed_data.float(), observed_tp.float(), data_to_predict.float(), tp_to_predict.float(), observed_mask.float(), mask_predicted_data.float(), labels.float(), mode, final_coords
+
+			else:
+				return observed_data, observed_tp, data_to_predict, tp_to_predict, observed_mask, mask_predicted_data, labels, mode, gt_instance
+
+			#return ravel_X, OH_target, OH_target_local_1, OH_target_local_2, mask, sub_gt_instance
+			#return  observed_data.float(), observed_tp.float(), data_to_predict.float(), tp_to_predict.float(), observed_mask.float(), mask_predicted_data.float(), labels.float(), mode
 
 	def get_rid_small_fg_tiles(self):
 		valid = np.ones(self.samples)

@@ -12,6 +12,7 @@ from lib.utils import Bunch, get_optimizer, plot_confusion_matrix
 from lib.construct import get_ODE_RNN_model#, get_classic_RNN_model
 from lib.ode_rnn import *
 from lib.parse_datasets import parse_datasets
+import swisscrop_classification
 
 from lib.latent_vis import get_pca_fig
 
@@ -20,7 +21,7 @@ from lib.diffeq_solver import DiffeqSolver
 
 import torch.nn as nn
 import torch
-from torch.utils.tensorboard import SummaryWriter
+#from torch.utils.tensorboard import SummaryWriter
 import torch.optim as optim
 
 from sklearn.metrics import confusion_matrix as sklearn_cm
@@ -160,7 +161,8 @@ def construct_and_train_model(config):
 			comment = nntype + "_ns:" + str(args.n) + "_ba:" + str(args.batch_size) + "_ode-units:" + str(args.units) + "_gru-uts:" + str(args.gru_units) + "_lats:"+ str(args.latents) + "_rec-lay:" + str(args.rec_layers) + "_solver:" + str(args.ode_method) + "_seed:" +str(args.random_seed) + "_optim:" + str(args.optimizer) + "_stackin:" + str(args.stacking) + str(args.stack_order)+ ODEws_str + RNNws_str + bn_str + rs_str
 
 			validationtensorboard_dir = "runs/expID" + str(ExperimentID[i]) + "_VALID" + comment
-			Validationwriter.append( SummaryWriter(validationtensorboard_dir, comment=comment) )
+			Validationwriter.append( "" )
+			#Validationwriter.append( SummaryWriter(validationtensorboard_dir, comment=comment) )
 			
 			tensorboard_dir = "runs/expID" + str(ExperimentID[i]) + "_TRAIN" + comment
 			#Trainwriter.append( SummaryWriter(tensorboard_dir, comment=comment) )
@@ -344,7 +346,7 @@ def train_it(
 					plot_cm = True
 					if plot_cm:
 						cm, conf_fig = plot_confusion_matrix(label_dict[0]["correct_labels"],label_dict[0]["predict_labels"], Data_obj[0]["dataset_obj"].label_list, tensor_name='dev/cm')
-						Validationwriter[i].add_figure("Validation_Confusionmatrix", conf_fig, itr*args.batch_size)
+						#Validationwriter[i].add_figure("Validation_Confusionmatrix", conf_fig, itr*args.batch_size)
 						
 					# prepare GT labels and predictions
 					y_ref_train = torch.argmax(train_res[0]['label_predictions'], dim=2).squeeze().cpu()
@@ -373,6 +375,8 @@ def train_it(
 							'cm': cm
 						}, Top_ckpt_path[i])
 
+						if "coords" in label_dict[0].keys():
+							utils.save_pred(label_dict[0]["correct_labels"], label_dict[0]["predict_labels"], label_dict[0]["coords"])
 
 						#utils.plot_confusion_matrix2(y_ref, y_pred, Data_obj[0]["dataset_obj"].label_list, ExperimentID[i])
 						# Save trajectory here

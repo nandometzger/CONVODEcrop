@@ -301,7 +301,7 @@ class Encoder_z0_ODE_RNN(nn.Module):
 			#Include inplementationin case of no ODE function
 			if self.use_ODE:
 				
-				experiment = True
+				experiment = self.convolutional
 				if experiment:
 					shapmem = prev_y.permute(0,2,3,1).shape
 					prev_y = prev_y.permute(0,2,3,1).reshape(-1,self.latent_dim).unsqueeze(0)

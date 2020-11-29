@@ -245,8 +245,25 @@ def get_next_batch(dataloader, dataset):
 
 	batch_dict = get_dict_template()
 
-	#TODO: Implement case, where a batch-dict has to be composed!
-	if dataset=="swissmaps":
+	if not dataset in ["swissmaps"] and not isinstance(data_dict,dict):
+
+		dataset = "swissmaps_test"
+		Xshape = data_dict[0].shape
+
+		data_dict[0] = data_dict[0].reshape((-1,) + Xshape[2:] )
+		data_dict[1] = data_dict[1].repeat( Xshape[1:2] + (1,) )
+		data_dict[2] = data_dict[2].reshape((-1,) + Xshape[2:] )
+		data_dict[3] = data_dict[3].repeat( Xshape[1:2] + (1,) )
+		data_dict[4] = data_dict[4].reshape((-1,) + Xshape[2:] )
+		data_dict[5] = data_dict[5].reshape((-1,) + Xshape[2:] )
+		labshape = data_dict[6].shape
+		data_dict[6] = data_dict[6].reshape( (-1,) + labshape[2:3] )
+		data_dict[7] = data_dict[7][0]
+
+		batch_dict["coords"] = data_dict[8].permute(0,2,1).reshape((-1,) + (2,))
+
+	# Implementation of case, where a batch-dict has to be composed!
+	if dataset in ["swissmaps", "swissmaps_test"]:
 		data_dict = {
 			"observed_data": data_dict[0],
 			"observed_tp": data_dict[1][0],
@@ -258,7 +275,7 @@ def get_next_batch(dataloader, dataset):
 			"mode": data_dict[7]
 		}
 
-	if dataset=="swissmaps":
+	if dataset in ["swissmaps", "swissmaps_test"]:
 		batch_dict["observed_data"] = data_dict["observed_data"]
 		batch_dict[ "data_to_predict"] = data_dict["data_to_predict"]
 		batch_dict["observed_tp"] = data_dict["observed_tp"]
@@ -602,6 +619,7 @@ def compute_loss_all_batches(model,
 	all_test_labels =  torch.Tensor([]).to(device)
 	hard_test_labels =  torch.Tensor([]).long().to(device)
 	hard_classif_predictions = torch.Tensor([]).long().to(device)
+	coords = []
 	plot_latent = False
 	stored_latents = False
 	save_latents = 0
@@ -631,6 +649,8 @@ def compute_loss_all_batches(model,
 			hard_test_labels = torch.cat((hard_test_labels, 
 				batch_dict["labels"].max(-1)[1]  ), 0)
 
+		if "coords" in batch_dict.keys(): 
+			coords.append( batch_dict["coords"] )
 
 		for key in total.keys(): 
 			if key in results:
@@ -733,7 +753,12 @@ def compute_loss_all_batches(model,
 	if stored_latents:
 		total["PCA_traj"] = PCA_traj
 
-	return total, {"correct_labels": correct_labels, "predict_labels": predict_labels}
+	outdict = {"correct_labels": correct_labels, "predict_labels": predict_labels}
+	if "coords" in batch_dict.keys():
+		outdict["coords"] = np.concatenate(coords,0)
+
+
+	return total, outdict
 
 def check_mask(data, mask):
 	#check that "mask" argument indeed contains a mask for data
@@ -1154,3 +1179,25 @@ def plot_confusion_matrix2(target_test, pred_test, valid_labels_names, Experimen
 	plt.savefig('vis/cm' + str(ExperimentID) + '.pdf', bbox_inches='tight')
 	plt.close()
 
+def save_pred(targets, predictions, coords):
+	"""
+	saves the predictions for later visualisation
+	"""
+	ntargetclasses = 14
+	patch = 24
+	ntrainsamples = 27977
+	
+	print("Writing predictions ...")
+
+	hdf5_file = h5py.File( "data/SwissCrops/Predictions/Predictions.hdf5", mode='w', rdcc_nbytes=1024**2*16000, rdcc_nslots=1e7, libver='latest')
+	hdf5_file.create_dataset("targets", (ntrainsamples, patch, patch, 1), np.int8,  chunks=(1, patch, patch, 1))
+	hdf5_file.create_dataset("predictions2", (ntrainsamples, patch, patch, 1), np.int8,  chunks=(1, patch, patch, 1))
+	
+	for i in np.unique(coords[:,1]):
+		# fill in hdf5_file
+		hdf5_file["targets"][i,1:-1,1:-1,0] = targets[i==coords[:,1]].reshape(patch-2,patch-2)
+		hdf5_file["predictions2"][i,1:-1,1:-1,0] = predictions[i==coords[:,1]].reshape(patch-2,patch-2)
+
+	hdf5_file.close()
+	
+	return
