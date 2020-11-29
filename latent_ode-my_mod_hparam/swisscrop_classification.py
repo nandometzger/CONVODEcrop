@@ -782,7 +782,9 @@ class Dataset(torch.utils.data.Dataset):
 	
 		self.label_listall = []
 		self.label_list13 = []
+		self.label_list13_name = []
 		self.label_list23 = []
+		self.label_list23_name = []
 		for i in range(len(tier_2)):
 			if tier_1[i] == 'Vegetation' and tier_4[i] != '':
 				self.label_listall.append(i)
@@ -919,11 +921,14 @@ class Dataset(torch.utils.data.Dataset):
 
 	def nclasses(self):
 		if self.label_type=='13':
-			return 13
+			return 13+1
 		if self.label_type=='23':
-			return 23
+			return 23+1
 		else:
-			return 51 
+			return 51
+
+	def uniquelabels(self):
+		return  np.unique(self.labellistglob13)
 
 	def get_label(self, record_id):
 		return self.label_dict[record_id]
@@ -966,7 +971,7 @@ class Dataset(torch.utils.data.Dataset):
 			this_label_list_glob =self.label_list_glob			
 			reflistglob = self.labellistglob
 			
-		#Change labels 
+		#Change labels
 		target = np.zeros_like(target_)
 		#dummy = np.zeros_like(target_)
 		target_local_1 = np.zeros_like(target_)
@@ -1024,6 +1029,30 @@ class Dataset(torch.utils.data.Dataset):
 		
 		if not self.untile:
 			if self.prepare_output:
+				
+				"""
+				new_labs = self.label_list_glob13[i]
+				for uu in self.uniquelabels():
+					new_labs[new_labs==uu] = i+1
+
+
+				#Change labels
+				target = np.zeros_like(target_)
+				#dummy = np.zeros_like(target_)
+				target_local_1 = np.zeros_like(target_)
+				target_local_2 = np.zeros_like(target_)
+				#dummy_ = np.arange(24*24).reshape(24,24)
+				for i in range(len(self.labellist13)):
+					#target[target_ == self.label_list[i]] = i
+					#target[target_ == self.label_list[i]] = self.tier_4_elements_reduced.index(self.label_list_glob[i])
+					#target_local_1[target_ == self.label_list[i]] = self.tier_2_elements_reduced.index(self.label_list_local_1[i])
+					#target_local_2[target_ == self.label_list[i]] = self.tier_3_elements_reduced.index(self.label_list_local_2[i])
+					#dummy[dummy_ == this_label_list[i]] = this_label_list_glob[i]
+					target_new[target_ == self.labellist13[i]] = self.label_list_glob13[i]
+					target_local_1[target_ == self.labellist13[i]] = self.label_list_local_1[i]
+					target_local_2[target_ == self.labellist13[i]] = self.label_list_local_2[i]
+				"""
+						
 				# prepare to feed it to conv-rnns
 				
 				data_full = torch.from_numpy( X ).float()#.to(self.dataset.device)
@@ -1103,17 +1132,20 @@ class Dataset(torch.utils.data.Dataset):
 				remap=True #no not change, remapping is needed for swissdata!!
 				if remap:
 					targetind = data_dict["labels"]
+					other_class = self.nclasses()
 
 					for i in range(len(self.labellistglob)):
 						#delete the label if it is not within the k most frequent classes k={13,23}
+						# do not really delete it, but make it a new class "other" that summarizes them
 						if not (self.labellist[i] in self.labellist13):
-							targetind[targetind == self.labellistglob[i]] = 0
+							targetind[targetind == self.labellistglob[i]] = -1
 					
 					# Reduce range of labels
-					uniquelabels = np.unique(self.labellistglob13)
-					for i in range(self.nclasses()):
-						targetind[targetind == uniquelabels[i]] = i+1
-
+					#uniquelabels = np.unique(self.labellistglob13)
+					for i in range(self.nclasses()-1):
+						targetind[targetind == self.uniquelabels()[i]] = i+1
+					targetind[targetind == -1] = other_class
+					
 					#Convert back to one hot
 					labels = torch.nn.functional.one_hot(targetind.long(),self.nclasses()+1).permute(2,0,1)
 					#labels = torch.zeros((h, w, self.nclasses()))

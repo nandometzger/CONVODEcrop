@@ -81,6 +81,10 @@ class Baseline(nn.Module):
 		self.train_classif_w_reconstr = train_classif_w_reconstr
 		self.convolutional = convolutional
 
+		weights = torch.ones(n_labels).to(device)
+		weights[0] = 0
+		self.celossfkt = torch.nn.CrossEntropyLoss(weight=weights)
+
 		z0_dim = latent_dim
 		if use_poisson_proc:
 			z0_dim += latent_dim
@@ -171,7 +175,8 @@ class Baseline(nn.Module):
 				ce_loss = compute_multiclass_CE_loss(
 					info["label_predictions"], 
 					batch_dict["labels"],
-					mask = batch_dict["mask_predicted_data"], convolutional=self.convolutional)
+					mask = batch_dict["mask_predicted_data"],
+					convolutional=self.convolutional, lossfkt=self.celossfkt)
 
 			if torch.isnan(ce_loss):
 				print("label pred")

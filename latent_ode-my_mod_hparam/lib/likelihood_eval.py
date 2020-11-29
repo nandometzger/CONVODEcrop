@@ -88,7 +88,7 @@ def compute_binary_CE_loss(label_predictions, mortality_label):
 	return ce_loss
 
 
-def compute_multiclass_CE_loss(label_predictions, true_label, mask, convolutional=False):
+def compute_multiclass_CE_loss(label_predictions, true_label, mask, convolutional=False, lossfkt=None):
 	#print("Computing multi-class classification loss: compute_multiclass_CE_loss")
 	def CXE(predicted, target):
 		return -(target * torch.log(predicted)).sum(dim=1).mean()
@@ -129,7 +129,10 @@ def compute_multiclass_CE_loss(label_predictions, true_label, mask, convolutiona
 	# For each trajectory, we get n_traj_samples samples from z0 -- compute loss on all of them
 	true_label = true_label.repeat(repshape)
 
-	label_predictions = label_predictions.reshape(n_traj_samples * n_traj * n_tp * h * w, n_dims)
+	if convolutional:
+		label_predictions = label_predictions.permute(0,2,3,1).reshape(n_traj_samples * n_traj * n_tp * h * w, n_dims)
+	else:
+		label_predictions = label_predictions.reshape(n_traj_samples * n_traj * n_tp * h * w, n_dims)
 	true_label = true_label.reshape(n_traj_samples * n_traj * n_tp * h * w, n_dims)
 
 	# choose time points with at least one measurement
@@ -176,8 +179,6 @@ def compute_multiclass_CE_loss(label_predictions, true_label, mask, convolutiona
 			#ce_loss = nn.CrossEntropyLoss()(pred_masked, labels_hard.long())
 			ce_loss = CXE(pred_masked, labels_soft)
 			res.append(ce_loss)
-
-		pdb.set_trace()
 		
 		ce_loss = torch.stack(res, 0).to(get_device(label_predictions))
 		ce_loss = torch.mean(ce_loss)
@@ -186,9 +187,13 @@ def compute_multiclass_CE_loss(label_predictions, true_label, mask, convolutiona
 
 	else: #Nando's alternative:
 
+		#weights = torch.ones(15).to(get_device(label_predictions))
+		#weights[0] = 0
+		ce_loss = lossfkt(label_predictions, torch.argmax(true_label,1))
+
 		# use a very small number to avoid numerical problems
-		eps = 1e-10
-		ce_loss = -(true_label * torch.log(label_predictions + eps)).sum(dim=1).mean()
+		#eps = 1e-10		
+		#ce_loss = -(true_label * torch.log(label_predictions + eps)).sum(dim=1).mean()
 
 	return ce_loss
 
