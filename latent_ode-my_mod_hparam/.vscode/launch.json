@@ -232,12 +232,12 @@
             "console": "integratedTerminal",
             "args": [
                 //#python3 run_models.py --niters 2 -n 11000000 -validn 300000 -b 600 --swissdatatype 2_toplabels -v 2 --ode-rnn --rnn-cell gru --stack-order gru --random-seed 6001 --stack-order gru -BN=true --topper=true --dataset swisscrop --step 2 --trunc 9
-                "--niters", "20",
+                "--niters", "30",
                 "-n", "3000",
-                "-validn", "100",
+                "-validn", "40",
                 "--dataset", "swissmaps",
                 "--swissdatatype", "2",
-                "--val_freq", "100",
+                "--val_freq", "5",
                 "-b", "2",
                 "--ode-rnn",
                 "--optimizer", "adam",
