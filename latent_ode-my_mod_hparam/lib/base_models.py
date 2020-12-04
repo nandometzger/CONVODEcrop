@@ -185,6 +185,8 @@ class Baseline(nn.Module):
 				print( batch_dict["labels"])
 				raise Exception("CE loss is Nan!")
 
+			#TODO: per-time-stamp classification
+
 		pois_log_likelihood = torch.Tensor([0.]).to(get_device(batch_dict["data_to_predict"]))
 		if self.use_poisson_proc:
 			pois_log_likelihood = compute_poisson_proc_likelihood(

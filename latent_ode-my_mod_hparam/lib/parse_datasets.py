@@ -218,7 +218,7 @@ def parse_datasets(args, device):
 			
 			t = 0.0 #attention, this t value is 0, because for training it is also 0. later: masked predction with t=0.9 will be performed! but for comparability with the other methods
 			test_dataset_obj = Dataset(data_path, t, 'test', args=args, prepare_output=True, label_type='13', device = device,
-									subsamp=args.testsub, step=args.step, part_update=args.part_update, noskip=args.noskip, untile=True)
+									subsamp=args.testsub, step=args.step, part_update=args.part_update, noskip=args.noskip, untile=True, ptval=True)
 		else:
 			test_dataset_obj = SwissCrops(root, mode="test", device=device,  noskip=args.noskip,
 											step=args.step, trunc=args.trunc, nsamples=args.validn,
@@ -265,7 +265,7 @@ def parse_datasets(args, device):
 		root = r'data/SwissCrops/raw'
 		scratch_root1 = r'/cluster/scratch/metzgern/ODEcrop/Swisscrop/raw'
 		scratch_root2 = r'/scratch/Nando/ODEcrop/Swisscrop/raw'
-		server_root1 = r'/home/pf/pfstud/metzgern_PF/ODE_Nando/ODE_crop_Project/latent_ode-my_mod_hparam/data/SwissCrops/raw'
+		server_root1 = r'/home/pf/pfstud/metzgern_PF/ODE_Nando/ODE_crop_Project/data/SwissCrops/raw'
 		if os.path.exists(scratch_root1):
 			root = scratch_root1
 			print(scratch_root1)

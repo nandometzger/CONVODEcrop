@@ -30,6 +30,19 @@ for model in model_list:
         target_test = preddata['targets'][:,:,:,0]
         pred_test = preddata['predictions2'][:,:,:,0]
         
+        # Do nearest neighbour interpolation for the border effects
+        startind = min(target_test.sum((1,2)).nonzero()[0])
+
+        target_test[:, -1, 1:-1] = target_test[:, -2, 1:-1]
+        target_test[:, 0, 1:-1] = target_test[:, 1, 1:-1]
+        pred_test[:, -1, 1:-1]  = pred_test[:, -2, 1:-1]
+        pred_test[:, 0, 1:-1] = pred_test[:, 1, 1:-1]
+
+        target_test[:, :, 0] = target_test[:, :, 1]
+        target_test[:, :, -1] = target_test[:, :, -2]
+        pred_test[:, :, 0] = pred_test[:, :, 1]
+        pred_test[:, :, -1] = pred_test[:, :, -2]
+
         #gt_list = data['arr_2']
         #gt_list_names = data['arr_3']
         #print(gt_list)
@@ -118,6 +131,9 @@ for model in model_list:
             performance_map[:,:,2] = performance_map_e
             performance_map[:,:,0] += performance_map_n
             performance_map[:,:,1] += performance_map_p
+
+            red = [np.unique(performance_map_n)[1],0,0]
+            green = [np.unique(performance_map_p)[1],0,0]
             
             pred_map_image = pred_map_image.astype(np.int8)
             target_map_image = target_map_image.astype(np.int8)
@@ -127,7 +143,7 @@ for model in model_list:
         #    if model == 'msConvSTAR':
         #        performance_map_occ = performance_map_occ[patch_1[0]:patch_1[0]+patch_size,patch_1[1]:patch_1[1]+patch_size]
 
-            #TODO: Manual cropping of images going on. do not crop it here, decide later on the cropping
+            # Manual cropping of images going on. do not crop it here, decide later on the cropping
             #performance_map = performance_map[patch_1[0]:patch_1[0]+patch_size,patch_1[1]:patch_1[1]+patch_size,:] 
             #target_map_image = target_map_image[patch_1[0]:patch_1[0]+patch_size,patch_1[1]:patch_1[1]+patch_size] 
                 
@@ -137,14 +153,31 @@ for model in model_list:
 
 
 
-
 #-----------------------------------------------------------------------------------------------------------
-#TODO: change names; change colors, 
+# change names; change colors, 
 
-labels = [0, 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+label_names = ['No Label','Maize', 'Meadow', 'Pasture', 'Potatoes', 'Spelt', 'Sugarbeets', 'Sunflowers', 'Vegetables', 'Vines',
+    'Wheat', 'Winter barley', 'Winter rapeseed', 'Winter wheat']
+labels = [0, 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13]
+colordict = {'No Label':[255,255,255],
+             'Maize': [241,97,95], 
+             'Meadow': [222,138,44], 
+             'Pasture':[23,244,111], 
+             'Potatoes':[213,71,202], 
+             'Spelt':[188,205,151],
+             'Sugarbeets':[119,190,32], 
+             'Sunflowers':[179,132,145], 
+             'Vegetables':[52,222,187], 
+             'Vines':[57,146,131], 
+             'Wheat':[88,162,238], 
+             'Winter barley':[217,201,55],
+             'Winter rapeseed': [252,194,251], 
+             'Winter wheat':[150,113,210] }
+
+oldlabels = [0, 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
  26, 27, 28, 29, 30, 31, 32, 33, 34, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 48, 49, 50, 51]
 
-label_names = ['Unknown', 'Apples', 'Beets', 'Berries', 'Biodiversity area', 'Buckwheat',
+oldlabel_names = ['Unknown', 'Apples', 'Beets', 'Berries', 'Biodiversity area', 'Buckwheat',
  'Chestnut', 'Chicory', 'Einkorn wheat', 'Fallow', 'Field bean', 'Forest',
  'Gardens', 'Grain', 'Hedge', 'Hemp', 'Hops', 'Legumes', 'Linen', 'Lupine',
  'Maize', 'Meadow', 'Mixed crop', 'Multiple', 'Mustard', 'Oat', 'Pasture', 'Pears',
@@ -153,7 +186,7 @@ label_names = ['Unknown', 'Apples', 'Beets', 'Berries', 'Biodiversity area', 'Bu
  'Tobacco', 'Tree crop', 'Vegetables', 'Vines', 'Wheat', 'Winter barley',
  'Winter rapeseed', 'Winter wheat']
 
-colordict = {'Unknown':[255,255,255],
+oldcolordict = {'Unknown':[255,255,255],
              'Apples':[128,0,0], 
              'Beets': [220,20,60], 
              'Berries':[255,107,70], 
@@ -221,7 +254,7 @@ valid_label_names = []
 for i in valid_labels:
     valid_label_names.append(label_names[labels.index(i)])
 
-valid_label_names.remove('Unknown')
+#valid_label_names.remove('Unknown')
 colors = [colordict[p] for p in valid_label_names]
 
 legendfig, ax = plt.subplots(1, 1)
@@ -234,7 +267,7 @@ legendfig.savefig("./viz/patch/legend_croped_patch_" +str(patch_num)+ ".png",dpi
 
 
 
-
+"""
 target_map_RGB = np.ones([target_map_image.shape[0],target_map_image.shape[1],3])*255
 
 for i_x in range(target_map_RGB.shape[0]):
@@ -250,3 +283,23 @@ for i_x in range(target_map_RGB.shape[0]):
 target_map_image_img = Image.fromarray(np.uint8(target_map_RGB))
 #target_map_image_img = target_map_image_img.resize((128,128), Image.NEAREST)
 target_map_image_img.save('./viz/patch/target_patch_'+str(patch_num)+'.png')
+"""
+
+
+
+
+pred_map_RGB = np.ones([pred_map_image.shape[0],pred_map_image.shape[1],3])*255
+
+for i_x in range(pred_map_RGB.shape[0]):
+    for i_y in range(pred_map_RGB.shape[1]):
+        pred_pix_val = pred_map_image[i_x,i_y]
+        #pred_pix_val = target_map_image[i_x,i_y]
+        if pred_pix_val==0:
+            continue
+        
+        target_pix_color = colordict[ label_names[labels.index(pred_pix_val)] ]
+        pred_map_RGB[i_x,i_y,:] = np.array(target_pix_color)*255
+
+pred_map_image_img = Image.fromarray(np.uint8(pred_map_RGB))
+#target_map_image_img = target_map_image_img.resize((128,128), Image.NEAREST)
+pred_map_image_img.save('./viz/patch/pred_patch_'+str(patch_num)+'.png')

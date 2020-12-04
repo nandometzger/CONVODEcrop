@@ -708,7 +708,7 @@ class Dataset(torch.utils.data.Dataset):
 	def __init__(self, path,  t=0.9, mode='all', eval_mode=False, fold=None, gt_path='data/SwissCrops/labelsC.csv',
 		step=1, feature_trunc=10, untile=False, prepare_output=False, cloud_thresh=0.05, label_type='all',
 		time_path="data/SwissCrops/raw_dates.hdf5", device=None, subsamp=1, early_prediction=0,
-		args=None, part_update=False, noskip=False ):
+		args=None, part_update=False, noskip=False, ptval=False ):
 
 		self.data = h5py.File(path, "r")
 		self.samples = self.data["data"].shape[0]
@@ -738,6 +738,7 @@ class Dataset(torch.utils.data.Dataset):
 		self.nb = 3
 		self.device = device
 		self.noskip = noskip
+		self.ptval = ptval
 		
 		if args!=None:
 			self.args = args
@@ -920,15 +921,29 @@ class Dataset(torch.utils.data.Dataset):
 
 
 	def nclasses(self):
-		if self.label_type=='13':
-			return 13+1
-		if self.label_type=='23':
-			return 23+1
+		if self.ptval:
+			if self.label_type=='13':
+				return 13
+			if self.label_type=='23':
+				return 23
+			else:
+				return 51
 		else:
-			return 51
+			if self.label_type=='13':
+				return 13+1
+			if self.label_type=='23':
+				return 23+1
+			else:
+				return 51+1
 
 	def uniquelabels(self):
 		return  np.unique(self.labellistglob13)
+
+	def thislabelnames(self):
+		out = []
+		for ll in self.uniquelabels():
+			out.append( self.label_list_glob_name13[(self.labellistglob13==ll).nonzero()[0][0]] )
+		return out
 
 	def get_label(self, record_id):
 		return self.label_dict[record_id]
@@ -1030,29 +1045,6 @@ class Dataset(torch.utils.data.Dataset):
 		if not self.untile:
 			if self.prepare_output:
 				
-				"""
-				new_labs = self.label_list_glob13[i]
-				for uu in self.uniquelabels():
-					new_labs[new_labs==uu] = i+1
-
-
-				#Change labels
-				target = np.zeros_like(target_)
-				#dummy = np.zeros_like(target_)
-				target_local_1 = np.zeros_like(target_)
-				target_local_2 = np.zeros_like(target_)
-				#dummy_ = np.arange(24*24).reshape(24,24)
-				for i in range(len(self.labellist13)):
-					#target[target_ == self.label_list[i]] = i
-					#target[target_ == self.label_list[i]] = self.tier_4_elements_reduced.index(self.label_list_glob[i])
-					#target_local_1[target_ == self.label_list[i]] = self.tier_2_elements_reduced.index(self.label_list_local_1[i])
-					#target_local_2[target_ == self.label_list[i]] = self.tier_3_elements_reduced.index(self.label_list_local_2[i])
-					#dummy[dummy_ == this_label_list[i]] = this_label_list_glob[i]
-					target_new[target_ == self.labellist13[i]] = self.label_list_glob13[i]
-					target_local_1[target_ == self.labellist13[i]] = self.label_list_local_1[i]
-					target_local_2[target_ == self.labellist13[i]] = self.label_list_local_2[i]
-				"""
-						
 				# prepare to feed it to conv-rnns
 				
 				data_full = torch.from_numpy( X ).float()#.to(self.dataset.device)
@@ -1060,7 +1052,7 @@ class Dataset(torch.utils.data.Dataset):
 				cloud_cover = torch.from_numpy(cloud_cover ).float()#.to(self.dataset.device)
 				labels = torch.from_numpy( target ).float()#.to(self.dataset.device)
 
-				# TODO: normalization!
+				# normalization
 				if self.normalize:
 					xshape = data_full.shape
 					data_full == (data_full-torch.tensor(self.means).unsqueeze(0).unsqueeze(2).unsqueeze(3).repeat(xshape[0],1,xshape[2],xshape[3]))/torch.tensor(self.stds).unsqueeze(0).unsqueeze(2).unsqueeze(3).repeat(xshape[0],1,xshape[2],xshape[3])
@@ -1091,13 +1083,6 @@ class Dataset(torch.utils.data.Dataset):
 						mask_shape =  (1,) + tuple(cloud_mask.shape[1:])
 						mask = (torch.sum(cloud_mask.bool(),(1,2,3))==0).unsqueeze(1).unsqueeze(2).unsqueeze(3).repeat(mask_shape)
 						data = data_full * mask
-				
-				"""
-				data = X#.to(self.dataset.device)
-				time_stamps = self.timestamps#.to(self.dataset.device)
-				mask = cloud_cover#.to(self.dataset.device)
-				labels = target#.to(self.dataset.device)
-				"""
 
 				data_dict = {
 					"data": data.to(self.device), 
@@ -1106,11 +1091,16 @@ class Dataset(torch.utils.data.Dataset):
 					"labels": labels}
 					
 				if self.subsamp>0 and self.subsamp<1:
-					max_len = data_dict["mask"].shape[1]
-					features = data_dict["mask"].shape[2]
+					#Subsample a random subset of time points, where the ratio is is also a random number between [self.subsamp,1]
+					max_len = data_dict["mask"].shape[0]
+					features = data_dict["mask"].shape[1]
 					validinds = [torch.nonzero(torch.sum(seq,1)) for seq in data_dict["mask"]] 
-					newinds = [ inds[torch.multinomial(torch.ones(len(inds)), max(int(len(inds)*self.subsamp), 1), replacement=False )] for inds in validinds]
-					data_dict["mask"] = torch.stack([ torch.zeros(max_len, dtype=torch.float32, device=self.device).scatter_(0, torch.squeeze(inds), 1) for inds in newinds]).unsqueeze(2).repeat(1,1,features)
+					validinds = torch.nonzero(torch.sum(data_dict["mask"],(1,2,3)))
+					#self.subsamp
+					#newinds = [ inds[torch.multinomial(torch.ones(len(inds)), max(int(len(inds)*self.subsamp), 1), replacement=False )] for inds in validinds]
+					newinds = validinds[torch.multinomial(torch.ones(len(validinds)), max(int(len(validinds)*torch.FloatTensor(1).uniform_(self.subsamp, 1)), 1), replacement=False )]
+					data_dict["mask"] = torch.zeros(max_len, dtype=torch.float32, device=self.device).scatter_(0, torch.squeeze(newinds), 1).unsqueeze(1).unsqueeze(2).unsqueeze(3).repeat(1,features,h,w)*data_dict["mask"]
+					#data_dict["mask"] = torch.stack([ torch.zeros(max_len, dtype=torch.float32, device=self.device).scatter_(0, torch.squeeze(inds), 1) for inds in newinds]).unsqueeze(2).repeat(1,1,features)
 
 				if self.early_prediction > 0:
 					zero_input_propagation = True
@@ -1133,23 +1123,30 @@ class Dataset(torch.utils.data.Dataset):
 				if remap:
 					targetind = data_dict["labels"]
 					other_class = self.nclasses()
+					substitute = -1
+
+					if self.ptval:
+						# ptval is used, when the class "nolabel" should be the same as "other"
+						substitute = -1
+						other_class = 0
 
 					for i in range(len(self.labellistglob)):
-						#delete the label if it is not within the k most frequent classes k={13,23}
+						# delete the label if it is not within the k most frequent classes k={13,23}
 						# do not really delete it, but make it a new class "other" that summarizes them
 						if not (self.labellist[i] in self.labellist13):
-							targetind[targetind == self.labellistglob[i]] = -1
+							targetind[targetind == self.labellistglob[i]] = substitute
 					
 					# Reduce range of labels
 					#uniquelabels = np.unique(self.labellistglob13)
 					for i in range(self.nclasses()-1):
 						targetind[targetind == self.uniquelabels()[i]] = i+1
-					targetind[targetind == -1] = other_class
+					targetind[targetind == substitute] = other_class
 					
 					#Convert back to one hot
 					labels = torch.nn.functional.one_hot(targetind.long(),self.nclasses()+1).permute(2,0,1)
 					#labels = torch.zeros((h, w, self.nclasses()))
 					#labels[np.arange(h), np.arange(w), targetind] = 1
+
 					data_dict["labels"] = labels.to(self.device)
 				else:
 					data_dict["labels"] = data_dict["labels"].to(self.device)
