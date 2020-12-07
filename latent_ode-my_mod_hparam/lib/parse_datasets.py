@@ -212,6 +212,9 @@ def parse_datasets(args, device):
 			data_path = rawroot + "/train_set_24x24_debug.hdf5"
 			print("dataroot for training: " + root)
 			print("data_path for training: " + data_path)
+			
+			args.n = args.n//484
+			
 			train_dataset_obj = Dataset(data_path, t, 'train', args=args, prepare_output=True, label_type='13', device = device,
 						subsamp=args.trainsub, step=args.step, part_update=args.part_update, noskip=args.noskip, untile=True, ptval=False)
 
@@ -222,6 +225,7 @@ def parse_datasets(args, device):
 			labels = a_train_dict[6]
 
 			train_batch_size = min(args.batch_size//484, args.n)
+			n_samples = min(args.n, len(train_dataset_obj))
 			
 		else:
 
@@ -235,6 +239,7 @@ def parse_datasets(args, device):
 			mask = a_train_dict["observed_mask"]
 			labels = a_train_dict["labels"]
 
+			n_samples = min(args.n, len(train_dataset_obj))
 			train_batch_size = min(args.batch_size, args.n)
 			
 		
@@ -260,22 +265,28 @@ def parse_datasets(args, device):
 			data_path = rawroot + "/train_set_24x24_debug.hdf5"
 			print("dataroot for testing: " + root)
 			print("data_path for testing: " + data_path)
+
+			args.validn = args.validn//484
 			
 			test_dataset_obj = Dataset(data_path, t, 'test', args=args, prepare_output=True, label_type='13', device = device,
 									subsamp=args.testsub, step=args.step, part_update=args.part_update, noskip=args.noskip, untile=True, ptval=False)
+			
+			n_test_samples = min( float("inf"), len(test_dataset_obj))
 		else:
 			test_dataset_obj = SwissCrops(root, mode="test", device=device,  noskip=args.noskip,
 											step=args.step, trunc=args.trunc, nsamples=args.validn,
 											datatype=args.swissdatatype, singlepix=args.singlepix) 
-			
-		n_samples = min(args.n, len(train_dataset_obj))
-		n_test_samples = min( float("inf"), len(test_dataset_obj))
+
+			n_test_samples = min( float("inf"), len(test_dataset_obj))
+
+
+		#n_samples = min(args.n, len(train_dataset_obj))
+		#n_test_samples = min( float("inf"), len(test_dataset_obj))
 		
 		#evaluation batch sizes. #Must be tuned to increase efficency of evaluation
 		validation_batch_size = 5000 if not map_test else 10 # size 30000 is 10s per batch, also depending on server connection
 		test_batch_size = min(n_test_samples, validation_batch_size)
 
-		
 		if map_train:
 			train_dataloader = torch.utils.data.DataLoader(train_dataset_obj,batch_size=train_batch_size, shuffle=True,
 														num_workers=0, worker_init_fn=np.random.seed(1996))

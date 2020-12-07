@@ -375,7 +375,8 @@ def train_it(
 							'cm': cm
 						}, Top_ckpt_path[i])
 
-						if "coords" in label_dict[0].keys():
+						write_map = False
+						if "coords" in label_dict[0].keys() and write_map:
 							utils.save_pred(label_dict[0]["correct_labels"], label_dict[0]["predict_labels"], label_dict[0]["coords"])
 
 						#utils.plot_confusion_matrix2(y_ref, y_pred, Data_obj[0]["dataset_obj"].label_list, ExperimentID[i])
