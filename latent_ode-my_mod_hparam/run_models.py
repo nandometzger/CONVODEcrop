@@ -62,7 +62,7 @@ parser.add_argument('--load', type=str, default=None, help="NOT IN USE! ID of th
 parser.add_argument('-r', '--random-seed', type=int, default=1991, help="Random_seed")
 
 parser.add_argument('--dataset', type=str, default='crop', help="Dataset to load. Available: crop, swisscrop, swissmaps")
-parser.add_argument('--"swissmaps_test"', type=bool, default=False, help="As default, it will take the same data type also for testing. For swisscrop, one has the option to evaluate on the swissmap in order to produce maps.")
+parser.add_argument('--swissmapsto3x3', type=bool, default=False, help="If true, it will take the map data, unfold it to 3x3 to use it with ODE-GRU to compare it with CONVODE-GRU")
 parser.add_argument('-s', '--sample-tp', type=float, default=None, help="NOT IN USE! Number of time points to sub-sample."
 	"If > 1, subsample exact number of points. If the number is in [0,1], take a percentage of available points per time series. If None, do not subsample")
 

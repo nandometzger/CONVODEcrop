@@ -189,18 +189,63 @@ def parse_datasets(args, device):
 			print(scratch_root2)
 		print("dataroot: " + root)
 
-		train_dataset_obj = SwissCrops(root, mode="train", device=device,  noskip=args.noskip,
+		t = 0.9 #attention, this t value is 0 (later 0.9), because for training it is also 0. later: masked predction with t=0.9 will be performed! but for comparability with the other methods
+		map_train = args.swissmapsto3x3
+		if map_train:
+			# using the swissmap dataset for testing/evaluation
+			# Search for a dataroot
+			rawroot = r'data/SwissCrops/raw'
+			scratch_root1 = r'/cluster/scratch/metzgern/ODEcrop/Swisscrop/raw'
+			scratch_root2 = r'/scratch/Nando/ODEcrop/Swisscrop/raw'
+			server_root1 = r'/home/pf/pfstud/metzgern_PF/ODE_Nando/ODE_crop_Project/data/SwissCrops/raw'
+			if os.path.exists(scratch_root1):
+				rawroot = scratch_root1
+				print(scratch_root1)
+			elif os.path.exists(scratch_root2):
+				rawroot = scratch_root2
+				print(scratch_root2)
+			elif os.path.exists(server_root1):
+				rawroot = server_root1
+				print(server_root1)
+			else:
+				print(rawroot, " not found")
+			data_path = rawroot + "/train_set_24x24_debug.hdf5"
+			print("dataroot for training: " + root)
+			print("data_path for training: " + data_path)
+			train_dataset_obj = Dataset(data_path, t, 'train', args=args, prepare_output=True, label_type='13', device = device,
+						subsamp=args.trainsub, step=args.step, part_update=args.part_update, noskip=args.noskip, untile=True, ptval=False)
+
+			a_train_dict = train_dataset_obj[0]
+			vals = a_train_dict[0]
+			tt = a_train_dict[1]
+			mask = a_train_dict[4]
+			labels = a_train_dict[6]
+
+			train_batch_size = min(args.batch_size//484, args.n)
+			
+		else:
+
+			train_dataset_obj = SwissCrops(root, mode="train", device=device,  noskip=args.noskip,
 										step=args.step, trunc=args.trunc, nsamples=args.n,
 										datatype=args.swissdatatype, singlepix=args.singlepix)
+
+			a_train_dict = train_dataset_obj[0]
+			vals = a_train_dict["observed_data"]
+			tt = a_train_dict["observed_tp"]
+			mask = a_train_dict["observed_mask"]
+			labels = a_train_dict["labels"]
+
+			train_batch_size = min(args.batch_size, args.n)
+			
 		
-		map_test = True
+		map_test = args.swissmapsto3x3
 		if map_test:
 			# using the swissmap dataset for testing/evaluation
 			# Search for a dataroot
 			rawroot = r'data/SwissCrops/raw'
 			scratch_root1 = r'/cluster/scratch/metzgern/ODEcrop/Swisscrop/raw'
 			scratch_root2 = r'/scratch/Nando/ODEcrop/Swisscrop/raw'
-			server_root1 = r'/home/pf/pfstud/metzgern_PF/ODE_Nando/ODE_crop_Project/latent_ode-my_mod_hparam/data/SwissCrops/raw'
+			server_root1 = r'/home/pf/pfstud/metzgern_PF/ODE_Nando/ODE_crop_Project/data/SwissCrops/raw'
 			if os.path.exists(scratch_root1):
 				rawroot = scratch_root1
 				print(scratch_root1)
@@ -216,9 +261,8 @@ def parse_datasets(args, device):
 			print("dataroot for testing: " + root)
 			print("data_path for testing: " + data_path)
 			
-			t = 0.0 #attention, this t value is 0, because for training it is also 0. later: masked predction with t=0.9 will be performed! but for comparability with the other methods
 			test_dataset_obj = Dataset(data_path, t, 'test', args=args, prepare_output=True, label_type='13', device = device,
-									subsamp=args.testsub, step=args.step, part_update=args.part_update, noskip=args.noskip, untile=True, ptval=True)
+									subsamp=args.testsub, step=args.step, part_update=args.part_update, noskip=args.noskip, untile=True, ptval=False)
 		else:
 			test_dataset_obj = SwissCrops(root, mode="test", device=device,  noskip=args.noskip,
 											step=args.step, trunc=args.trunc, nsamples=args.validn,
@@ -229,16 +273,18 @@ def parse_datasets(args, device):
 		
 		#evaluation batch sizes. #Must be tuned to increase efficency of evaluation
 		validation_batch_size = 5000 if not map_test else 10 # size 30000 is 10s per batch, also depending on server connection
-		train_batch_size = min(args.batch_size, args.n)
 		test_batch_size = min(n_test_samples, validation_batch_size)
 
-		a_train_dict = train_dataset_obj[0]
-		vals = a_train_dict["observed_data"]
-		tt = a_train_dict["observed_tp"]
-		mask = a_train_dict["observed_mask"]
-		labels = a_train_dict["labels"]
 		
-		train_dataloader = FastTensorDataLoader(train_dataset_obj, batch_size=train_batch_size, subsamp=args.trainsub)
+		if map_train:
+			train_dataloader = torch.utils.data.DataLoader(train_dataset_obj,batch_size=train_batch_size, shuffle=True,
+														num_workers=0, worker_init_fn=np.random.seed(1996))
+			outclasses = train_dataset_obj.nclasses()+1
+
+		else:
+			train_dataloader = FastTensorDataLoader(train_dataset_obj, batch_size=train_batch_size, subsamp=args.trainsub)
+			outclasses = train_dataloader.nclasses+1
+		
 		if map_test:
 			test_dataloader = torch.utils.data.DataLoader(test_dataset_obj,batch_size=test_batch_size, shuffle=True,
 														num_workers=0, worker_init_fn=np.random.seed(1996))
@@ -252,7 +298,7 @@ def parse_datasets(args, device):
 					"n_train_batches": len(train_dataloader),
 					"n_test_batches": len(test_dataloader),
 					"classif_per_tp": False, # We want to classify the whole sequence!!. Standard: True, #optional
-					"n_labels": train_dataloader.nclasses+1} #plus one, because there is one class that summerizes all the other classes--> "other" is "0"
+					"n_labels": outclasses} #plus one, because there is one class that summerizes all the other classes--> "other" is "0"
 		
 		return data_objects
 

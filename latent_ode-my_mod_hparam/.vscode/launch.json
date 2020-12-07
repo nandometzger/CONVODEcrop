@@ -157,6 +157,38 @@
                 "--trunc", "9",
             ]
         },
+        {
+            "name": "ODE-GRU: Swisscrop, swissmapsto3x3",
+            "type": "python",
+            "request": "launch",
+            "program": "/home/pf/pfstud/metzgern_PF/IPA/Code/CONVODEcrop/latent_ode-my_mod_hparam/run_models.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--niters", "2",
+                "-n", "11000000",
+                "-validn", "1000",
+                "--dataset", "swisscrop",
+                "--swissdatatype", "2",
+                "--swissmapsto3x3", "true",
+                "--val_freq", "10",
+                "-b", "1500",
+                "--optimizer", "adamax",
+                "--ode-rnn",
+                "--rnn-cell", "gru",
+                "--random-seed", "6001",
+                "--stack-order", "ode_rnn",
+                "--lr", "0.00762",
+                "-g", "100",
+                "-l", "80",
+                "-u", "220",
+                "--rec-layers", "2",
+                "-v", "2",
+                "--topper", "true",
+                "-BN", "True",
+                "--step", "2",
+                "--trunc", "9",
+            ]
+        },
         
         {
             "name": "GRU-dt: Swisscrop",

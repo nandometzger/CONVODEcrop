@@ -1125,11 +1125,6 @@ class Dataset(torch.utils.data.Dataset):
 					other_class = self.nclasses()
 					substitute = -1
 
-					if self.ptval:
-						# ptval is used, when the class "nolabel" should be the same as "other"
-						substitute = -1
-						other_class = 0
-
 					for i in range(len(self.labellistglob)):
 						# delete the label if it is not within the k most frequent classes k={13,23}
 						# do not really delete it, but make it a new class "other" that summarizes them
@@ -1292,24 +1287,27 @@ class Dataset(torch.utils.data.Dataset):
 			remap=True #no not change, remapping is needed for swissdata!!
 			if remap:
 				targetind = data_dict["labels"]
+				other_class = self.nclasses()
+				substitute = -1
 
 				for i in range(len(self.labellistglob)):
-					#delete the label if it is not within the k most frequent classes k={13,23}
+					# delete the label if it is not within the k most frequent classes k={13,23}
+					# do not really delete it, but make it a new class "other" that summarizes them
 					if not (self.labellist[i] in self.labellist13):
-						targetind[targetind == self.labellistglob[i]] = 0
+						targetind[targetind == self.labellistglob[i]] = substitute
 				
 				# Reduce range of labels
-				uniquelabels = np.unique(self.labellistglob13)
-				for i in range(self.nclasses()):
-					targetind[targetind == uniquelabels[i]] = i+1
-
+				#uniquelabels = np.unique(self.labellistglob13)
+				for i in range(self.nclasses()-1):
+					targetind[targetind == self.uniquelabels()[i]] = i+1
+				targetind[targetind == substitute] = other_class
+				
 				#Convert back to one hot
-				labels = torch.nn.functional.one_hot(targetind.long(),self.nclasses()+1)
+				labels = torch.nn.functional.one_hot(targetind.long(),self.nclasses()+1)#.permute(1,0)
 				#labels = torch.zeros((h, w, self.nclasses()))
 				#labels[np.arange(h), np.arange(w), targetind] = 1
+
 				data_dict["labels"] = labels.to(self.device)
-			else:
-				data_dict["labels"] = data_dict["labels"].to(self.device)
 
 			data_dict = utils.split_and_subsample_batch(data_dict, self.args, data_type = self.mode)
 					
