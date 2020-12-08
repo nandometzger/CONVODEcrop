@@ -171,7 +171,7 @@
                 "--swissdatatype", "2",
                 "--swissmapsto3x3", "true",
                 "--val_freq", "5",
-                "-b", "1500",
+                "-b", "3000",
                 "--optimizer", "adamax",
                 "--ode-rnn",
                 "--rnn-cell", "gru",
