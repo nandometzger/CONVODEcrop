@@ -247,7 +247,7 @@ class Encoder_z0_ODE_RNN(nn.Module):
 
 		# Initialize the hidden state with noise
 		if self.RNNcell=='lstm':
-			hidden_shape[2] = hidden_shape[2]//2 
+			# hidden_shape[2] = hidden_shape[2]//2 
 
 			# make some noise
 			prev_h = torch.zeros(hidden_shape).data.normal_(0, 0.0001).to(device)
@@ -257,8 +257,12 @@ class Encoder_z0_ODE_RNN(nn.Module):
 			ci_std = torch.zeros(hidden_shape).data.normal_(0, 0.0001).to(device)
 			
 			#concatinate cell state and hidden state
-			prev_y = torch.cat([prev_h, ci], 2)
-			prev_std = torch.cat([prev_h_std, ci_std], 2)
+			if self.convolutional:
+				prev_y = torch.cat([prev_h, ci], 1)		
+				prev_std = torch.cat([prev_h_std, ci_std], 1)
+			else:
+				prev_y = torch.cat([prev_h, ci], 2)
+				prev_std = torch.cat([prev_h_std, ci_std], 2)
 		else:
 			# make some noise
 			prev_y = torch.zeros(hidden_shape).data.normal_(0, 0.0001).to(device)
@@ -330,7 +334,11 @@ class Encoder_z0_ODE_RNN(nn.Module):
 					assert(not torch.isnan(ode_sol).any())
 
 					if experiment:
-						ode_sol = ode_sol.reshape(shapmem[:3] + (n_intermediate_tp,) + (self.input_dim//2,)).permute(0,4,3,1,2)
+						if self.RNNcell=='lstm':
+							lastdim = self.input_dim
+						else:
+							lastdim = self.input_dim//2
+						ode_sol = ode_sol.reshape(shapmem[:3] + (n_intermediate_tp,) + (lastdim,)).permute(0,4,3,1,2)
 						prev_y = prev_y[0].reshape(shapmem).permute(0,3,1,2)
 
 				if torch.mean(ode_sol[:, :, 0, :]  - prev_y) >= 0.001:
@@ -380,15 +388,22 @@ class Encoder_z0_ODE_RNN(nn.Module):
 
 			if self.RNNcell=='lstm':
 				# In case of LSTM update, we have to take special care of the variables for the hidden and cell state
-				h_i_ode = yi_ode[:,:,:self.latent_dim//2]
-				c_i_ode = yi_ode[:,:,self.latent_dim//2:]
+				if self.convolutional:
+					h_i_ode = yi_ode[:,:self.latent_dim//2]
+					c_i_ode = yi_ode[:,self.latent_dim//2:]
+				else:
+					h_i_ode = yi_ode[:,:,:self.latent_dim//2]
+					c_i_ode = yi_ode[:,:,self.latent_dim//2:]
 				h_c_lstm = (h_i_ode, c_i_ode)
 
 				# actually this is a LSTM update here:
 				outi, yi_std = self.RNN_update(h_c_lstm, prev_std, xi)
 				# the RNN cell is a LSTM and outi:=(yi,ci), we only need h as latent dim
 				h_i_, c_i_ = outi[0], outi[1]
-				yi = torch.cat([h_i_, c_i_], -1)
+				if self.convolutional:
+					yi = torch.cat([h_i_, c_i_], 1)
+				else:
+					yi = torch.cat([h_i_, c_i_], -1)
 				yi_out = h_i_
 
 				if not self.use_ODE:

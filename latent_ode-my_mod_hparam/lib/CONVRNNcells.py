@@ -219,7 +219,6 @@ class CONVGRU_unit(nn.Module):
 		return new_y, new_y_std
 
 
-
 class CONVGRU_standard_unit(nn.Module):
 	def __init__(self, latent_dim, input_dim, 
 		update_gate = None,
@@ -259,6 +258,7 @@ class CONVGRU_standard_unit(nn.Module):
 
 	def forward(self, y_mean, y_std, x, masked_update = True):
 		
+		x = x[0,...]
 		y_concat = torch.cat([y_mean, y_std, x], -1)
 		
 		update_gate = self.update_gate(y_concat)
@@ -275,17 +275,18 @@ class CONVGRU_standard_unit(nn.Module):
 
 		if masked_update:
 			# IMPORTANT: assumes that x contains both data and mask
-			# update only the hidden states for hidden state only if at least one feature is present for the current time point
-			n_data_dims = x.size(-1)//2
-			mask = x[:, :, n_data_dims:]
-			utils.check_mask(x[:, :, :n_data_dims], mask)
 			
+			n_data_dims = x.size(1)//2
+			mask = x[:, n_data_dims:]
+			
+			filtermask = mask.sum((0,1))!=0
+
 			mask = (torch.sum(mask, -1, keepdim = True) > 0).float()
 
 			assert(not torch.isnan(mask).any())
 
-			new_y = mask * new_y + (1-mask) * y_mean
-			new_y_std = mask * new_y_std + (1-mask) * y_std
+			new_y = filtermask * new_y + (~filtermask) * y_mean
+			new_y_std = filtermask * new_y_std + (~filtermask)  * y_std
 
 			if torch.isnan(new_y).any():
 				print("new_y is nan!")
@@ -324,9 +325,9 @@ class CONVLSTM_unit(nn.Module):
 		#forward(self, x, hidden):
 
 		h, c = y_mean
-		h = h.view(h.size(1), -1)
-		c = c.view(c.size(1), -1)
-		x_short = x.view(x.size(1), -1)
+		#h = h.view(h.size(1), -1)
+		#c = c.view(c.size(1), -1)
+		x_short = x[0]
 
 		# Linear mappings
 		preact = self.i2h(x_short) + self.h2h(h)
@@ -339,43 +340,73 @@ class CONVLSTM_unit(nn.Module):
 		o_t = gates[:, -self.hidden_size:]
 
 		c_t = torch.mul(c, f_t) + torch.mul(i_t, g_t)
-
 		h_t = torch.mul(o_t, c_t.tanh())
 
-		new_h = h_t.view(1, h_t.size(0), -1)
-		new_c = c_t.view(1, c_t.size(0), -1)
+		new_h = h_t#.view(1, h_t.size(0), -1)
+		new_c = c_t#.view(1, c_t.size(0), -1)
 		
 		new_y = (new_h, new_c)
 
 		if masked_update:
 			# IMPORTANT: assumes that x contains both data and mask
-			# update only the hidden states for hidden state only if at least one feature is present for the current time point
-			n_data_dims = x.size(-1)//2
-			mask = x[:, :, n_data_dims:]
-			#pdb.set_trace()
-			utils.check_mask(x[:, :, :n_data_dims], mask)
 			
+			n_data_dims = x_short.size(1)//2
+			mask = x_short[:,n_data_dims:]
+			
+			filtermask = mask.sum((0,1))!=0
+
 			mask = (torch.sum(mask, -1, keepdim = True) > 0).float()
 
 			assert(not torch.isnan(mask).any())
 
-			new_h = mask * new_h + (1-mask) * y_mean[0]
-			new_c = mask * new_c + (1-mask) * y_mean[1]
-
+			new_h = filtermask * new_h + (~filtermask) * y_mean[0]
+			new_c = filtermask * new_c + (~filtermask)  * y_mean[1]
+			
 			new_y = (new_h, new_c)
 
 			if torch.isnan(new_h).any():
 				print("new_y is nan!")
 				print(mask)
-				print(new_h)
 				print(y_mean)
+				print(prev_new_y)
 				exit()
+
 			if torch.isnan(new_c).any():
 				print("new_y is nan!")
 				print(mask)
 				print(new_c)
 				print(y_mean)
 				exit()
+				
+				
+			# # IMPORTANT: assumes that x contains both data and mask
+			# # update only the hidden states for hidden state only if at least one feature is present for the current time point
+			# n_data_dims = x.size(-1)//2
+			# mask = x[:, :, n_data_dims:]
+			# #pdb.set_trace()
+			# utils.check_mask(x[:, :, :n_data_dims], mask)
+			
+			# mask = (torch.sum(mask, -1, keepdim = True) > 0).float()
+
+			# assert(not torch.isnan(mask).any())
+
+			# new_h = mask * new_h + (1-mask) * y_mean[0]
+			# new_c = mask * new_c + (1-mask) * y_mean[1]
+
+			# new_y = (new_h, new_c)
+
+			# if torch.isnan(new_h).any():
+			# 	print("new_y is nan!")
+			# 	print(mask)
+			# 	print(new_h)
+			# 	print(y_mean)
+			# 	exit()
+			# if torch.isnan(new_c).any():
+			# 	print("new_y is nan!")
+			# 	print(mask)
+			# 	print(new_c)
+			# 	print(y_mean)
+			# 	exit()
 		
 		# just return a dummy tensor, since it is not used later for this project.
 		new_y_std = y_std
