@@ -10,6 +10,7 @@ latent_ode-my_mod_hparam/CropODE
 latent_ode-my_mod_hparam/CropODE/
 latent_ode-my_mod_hparam/
 data/
+data
 data2/
 wandb
 results
@@ -23,4 +24,6 @@ runs
 experiments
 CropODE
 CropODE/
+oz_vis_mymod.py
+oz_vis.py
 
