@@ -15,6 +15,10 @@ wandb
 results
 vis
 logs
+results
+assets
+__pycache__
+viz
 runs
 experiments
 CropODE
