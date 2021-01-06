@@ -8,3 +8,15 @@ latent_ode-my_mod_hparam/runs
 latent_ode-my_mod_hparam/experiments
 latent_ode-my_mod_hparam/CropODE
 latent_ode-my_mod_hparam/CropODE/
+latent_ode-my_mod_hparam/
+data/
+data2/
+wandb
+results
+vis
+logs
+runs
+experiments
+CropODE
+CropODE/
+
